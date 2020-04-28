@@ -19,7 +19,7 @@ write_season <- function(y) {
   saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))
 }
 
-lapply(2000:2019, write_season)
+nothing_in_here <- lapply(2000:2019, write_season)
 
 
 #read_csv(glue::glue('data/play_by_play_{y}.csv'))
