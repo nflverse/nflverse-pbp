@@ -1,9 +1,12 @@
+
+#devtools::install_github("mrcaseb/nflfastR")
+
 library(nflfastR)
 library(tidyverse)
 
 ## STEP 1: SCRAPE OLD SEASONS
 write_season <- function(y) {
-  message(glue::glue('Year {y}: scraping play-by-play'))
+  message(glue::glue('Year {y}: scraping play-by-play of {nrow(fast_scraper_schedules(y) %>% filter(game_type != "PRE"))} games'))
   
   #get reg and post games
   pbp <- fast_scraper_schedules(y) %>%
