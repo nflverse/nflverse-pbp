@@ -7,7 +7,7 @@ write_season <- function(y) {
   
   #get reg and post games
   pbp <- fast_scraper_schedules(y) %>%
-    filter(game_type == "REG" | game_type == "POST") %>%
+    filter(game_type != 'PRE') %>%
     pull(game_id) %>%
     fast_scraper(pp = TRUE)
   
@@ -28,7 +28,7 @@ y = 2020
 
 #get reg and post games
 sched <- fast_scraper_schedules(y) %>%
-  filter(game_type == "REG" | game_type == "POST") %>%
+  filter(game_type != 'PRE') %>%
   select(game_id, week, game_type)
 
 pbp <- sched %>% pull(game_id) %>%
