@@ -44,6 +44,10 @@ write_csv(pbp, glue::glue('data/play_by_play_{y}.csv'))
 saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))
 
 
+## STEP 3: SCRAPE ROSTER
 
-
+current_year <- 2019
+roster <- teams_colors_logos %>% pull(team_id) %>% fast_scraper_roster(1999:current_year, TRUE)
+write_csv(roster, glue::glue('roster-data/roster_1999_to_{current_year}.csv'))
+saveRDS(roster, glue::glue('roster-data/roster_1999_to_{current_year}.rds'))
 
