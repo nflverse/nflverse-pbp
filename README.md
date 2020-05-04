@@ -15,6 +15,8 @@ pbp <- purrr::map_df(seasons, function(x) {
     )
   )
 })
+
+roster <- readRDS(url("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/roster-data/roster.rds"))
 ```
 
 However, if you want to load the data as .csv run this:
@@ -26,4 +28,6 @@ pbp <- purrr::map_df(seasons, function(x) {
     glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.csv")
   )
 })
+
+roster <- readr::read_csv("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/roster-data/roster.csv")
 ```
