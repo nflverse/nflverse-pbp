@@ -6,13 +6,16 @@ library(tidyverse)
 
 ## STEP 1: SCRAPE OLD SEASONS
 write_season <- function(y) {
-  message(glue::glue('Year {y}: scraping play-by-play of {nrow(fast_scraper_schedules(y) %>% filter(season_type %in% c("REG", "POST"))} games'))
+  message(glue::glue('Year {y}: scraping play-by-play of {
+                     nrow(fast_scraper_schedules(y) %>% filter(season_type %in% c("REG", "POST")))
+                     } games'))
   
   #get reg and post games
   pbp <- fast_scraper_schedules(y) %>%
     filter(season_type %in% c("REG", "POST")) %>%
     pull(game_id) %>%
-    fast_scraper(pp = TRUE)
+    fast_scraper(pp = TRUE) %>%
+    clean_pbp()
   
   message(glue::glue('Year {y}: writing to file'))
   write_csv(pbp, glue::glue('data/play_by_play_{y}.csv'))
