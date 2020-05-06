@@ -22,7 +22,7 @@ write_season <- function(y) {
   #   clean_pbp()
   
   message(glue::glue('Year {y}: writing to file'))
-  write_csv(pbp, glue::glue('data/play_by_play_{y}.csv'))
+  write_csv(pbp, glue::glue('data/play_by_play_{y}.csv.gz'))
   saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))
 }
 
@@ -44,13 +44,12 @@ pbp <- sched %>% pull(game_id) %>%
   #need to do this because week & game_type aren't in gc data
   left_join(sched, by = "game_id")
 
-write_csv(pbp, glue::glue('data/play_by_play_{y}.csv'))
+write_csv(pbp, glue::glue('data/play_by_play_{y}.csv.gz'))
 saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))
 
 
 ## STEP 3: SCRAPE ROSTER
 
 roster <- teams_colors_logos %>% pull(team_id) %>% fast_scraper_roster(1999:2019, TRUE)
-write_csv(roster, glue::glue('roster-data/roster.csv'))
+write_csv(roster, glue::glue('roster-data/roster.csv.gz'))
 saveRDS(roster, glue::glue('roster-data/roster.rds'))
-
