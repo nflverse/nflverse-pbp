@@ -39,4 +39,24 @@ ___
 
 ### Load data using Python
 
-TBA
+If you are using Python you can load the compressed csv data. The following example written by [Deryck](https://twitter.com/Deryck_SG) (thanks a lot!) loads the seasons 2017 to 2019 (binded into a single pandas dataframe) as well as rosters (from 2000 to latest season):
+```Python
+import pandas as pd 
+
+#Enter desired years of data
+YEARS = [2019,2018,2017]
+
+data = pd.DataFrame()
+
+for i in YEARS:  
+    #low_memory=False eliminates a warning
+    i_data = pd.read_csv('https://github.com/guga31bb/nflfastR-data/blob/compressed_csvs/' \
+                         'data/play_by_play_' + str(i) + '.csv.gz?raw=true',
+                         compression='gzip', low_memory=False)
+
+    #sort=True eliminates a warning and alphabetically sorts columns
+    data = data.append(i_data, sort=True)
+    
+roster = pd.read_csv('https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/' \ 
+                     'roster-data/roster.csv.gz', compression='gzip', low_memory=False)
+```
