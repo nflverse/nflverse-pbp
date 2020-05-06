@@ -10,12 +10,16 @@ write_season <- function(y) {
                      nrow(fast_scraper_schedules(y) %>% filter(season_type %in% c("REG", "POST")))
                      } games'))
   
-  #get reg and post games
+  # get reg and post games with scraper
   pbp <- fast_scraper_schedules(y) %>%
     filter(season_type %in% c("REG", "POST")) %>%
     pull(game_id) %>%
     fast_scraper(pp = TRUE) %>%
     clean_pbp()
+  
+  # get reg and post gamesfrom rds
+  # pbp <- readRDS(glue::glue('data/play_by_play_{y}.rds')) %>%
+  #   clean_pbp()
   
   message(glue::glue('Year {y}: writing to file'))
   write_csv(pbp, glue::glue('data/play_by_play_{y}.csv'))
@@ -24,9 +28,6 @@ write_season <- function(y) {
 
 nothing_in_here <- lapply(2000:2019, write_season)
 
-
-#read_csv(glue::glue('data/play_by_play_{y}.csv'))
-#readRDS(glue::glue('data/play_by_play_{y}.rds'))
 
 ## STEP 2: SCRAPE ONGOING SEASON
 
@@ -49,8 +50,7 @@ saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))
 
 ## STEP 3: SCRAPE ROSTER
 
-current_year <- 2019
-roster <- teams_colors_logos %>% pull(team_id) %>% fast_scraper_roster(1999:current_year, TRUE)
-write_csv(roster, glue::glue('roster-data/roster_1999_to_{current_year}.csv'))
-saveRDS(roster, glue::glue('roster-data/roster_1999_to_{current_year}.rds'))
+roster <- teams_colors_logos %>% pull(team_id) %>% fast_scraper_roster(1999:2019, TRUE)
+write_csv(roster, glue::glue('roster-data/roster.csv'))
+saveRDS(roster, glue::glue('roster-data/roster.rds'))
 
