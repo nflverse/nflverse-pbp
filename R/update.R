@@ -1,8 +1,11 @@
-
 #devtools::install_github("mrcaseb/nflfastR")
 
 library(nflfastR)
 library(tidyverse)
+
+#needed for fix_fumbles()
+source('https://raw.githubusercontent.com/mrcaseb/nflfastR/master/R/helper_additional_functions.R')
+library(nflscrapR)
 
 ## STEP 1: SCRAPE OLD SEASONS
 write_season <- function(y) {
@@ -15,7 +18,8 @@ write_season <- function(y) {
     filter(season_type %in% c("REG", "POST")) %>%
     pull(game_id) %>%
     fast_scraper(pp = TRUE) %>%
-    clean_pbp()
+    clean_pbp() %>%
+    fix_fumbles()
   
   # get reg and post gamesfrom rds
   # pbp <- readRDS(glue::glue('data/play_by_play_{y}.rds')) %>%
@@ -35,13 +39,16 @@ y = 2020
 
 #get reg and post games
 sched <- fast_scraper_schedules(y) %>%
-  filter(game_type != 'PRE') %>%
-  select(game_id, week, game_type)
+  filter(season_type %in% c("REG", "POST")) %>%
+  select(game_id, week, season_type)
 
 pbp <- sched %>% pull(game_id) %>%
   fast_scraper(source = 'gc', pp = TRUE) %>%
   mutate(game_id = as.numeric(game_id)) %>%
-  #need to do this because week & game_type aren't in gc data
+  clean_pbp() %>%
+  fix_fumbles()
+  #need to do this because week & season_type aren't in gc data
+  #if we find a live-updating RS feed we can get rid of this part
   left_join(sched, by = "game_id")
 
 write_csv(pbp, glue::glue('data/play_by_play_{y}.csv.gz'))
