@@ -23,7 +23,8 @@ write_season <- function(y) {
   
   # get reg and post gamesfrom rds
   # pbp <- readRDS(glue::glue('data/play_by_play_{y}.rds')) %>%
-  #   clean_pbp()
+  #   clean_pbp() %>%
+  #   fix_fumbles()
   
   message(glue::glue('Year {y}: writing to file'))
   write_csv(pbp, glue::glue('data/play_by_play_{y}.csv.gz'))
