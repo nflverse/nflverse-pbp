@@ -81,7 +81,15 @@ save_game <- function(token, df) {
     jsonlite::fromJSON(flatten = TRUE)
   
   saveRDS(raw_data, glue::glue('raw/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.rds'))
+  
+  # save compressed JSON so non-R users can work with it
+  request %>%
+    httr::content(as = "text", encoding = "UTF-8") %>%
+    jsonlite::fromJSON(flatten = TRUE) %>%
+    jsonlite::write_json(glue::glue('raw/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.json'))
+  system(glue::glue('gzip raw/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.json'))
+  # read those files with
+  # df <- jsonlite::fromJSON("raw/{alt_game_id}.json.gz")
+  
   message(glue::glue('Saved {season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}'))
 }
-
-
