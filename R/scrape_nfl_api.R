@@ -17,7 +17,7 @@ token <- get_token()
 
 #build 2019 data: reg
 nothing_in_here <- map(1:17, function(x) {
-  save_week(token, 2018, 'REG', x)
+  save_week(token, 2019, 'REG', x)
   message(glue::glue('Finished week {x}'))
   Sys.sleep(3)
 })

@@ -15,7 +15,7 @@ get_token <- function() {
   return(token)
 }
 
-#get game ids
+#get game ids and other game info
 get_week_games <- function(token, season, season_type, week) {
 
   #get detailed game info
