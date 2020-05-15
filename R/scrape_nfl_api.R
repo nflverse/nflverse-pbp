@@ -4,7 +4,7 @@ source('R/scraping_functions.R')
 if (grepl("Documents",getwd())){
   path <- ".."
 } else { ### server
-  path <- "/home/ben/"
+  path <- "/home/ben"
 }
 
 ################################################################################
