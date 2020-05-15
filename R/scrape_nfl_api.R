@@ -22,7 +22,7 @@ nothing_in_here <- map(1:17, function(x) {
   Sys.sleep(3)
 })
 
-#build 2017 data: post
+#build 2019 data: post
 #right now this fails for super bowls
 nothing_in_here <- map(1:4, function(x) {
   save_week(token, 2019, 'POST', x)
