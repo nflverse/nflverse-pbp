@@ -17,7 +17,7 @@ get_token <- function() {
 
 #get game ids
 get_week_games <- function(token, season, season_type, week) {
-  
+
   #get detailed game info
   if(between(week, 1, 17) & season_type == "REG") {
     query <- glue::glue("%7B%22%24query%22%3A%7B%22week.season%22%3A{season}%2C%22week.seasonType%22%3A%22REG%22%2C%22week.week%22%3A{week}%7D%7D")
