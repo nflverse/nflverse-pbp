@@ -1,4 +1,12 @@
+library(tidyverse)
 
+if (grepl("Documents",getwd())){
+  path <- ".."
+} else { ### server
+  path <- "/home/ben"
+}
+
+password = as.character(read.delim(glue::glue('{path}/gh.txt'))$pw)
 
 
 #pick some random game and save token
@@ -16,25 +24,50 @@ get_token <- function() {
 }
 
 #get game ids and other game info
-get_week_games <- function(token, season, season_type, week) {
-
-  #get detailed game info
-  if(between(week, 1, 17) & season_type == "REG") {
-    query <- glue::glue("%7B%22%24query%22%3A%7B%22week.season%22%3A{season}%2C%22week.seasonType%22%3A%22REG%22%2C%22week.week%22%3A{week}%7D%7D")
-  } else if(between(week, 1, 3) & season_type == "POST") {
-    query <- glue::glue("%7B%22%24query%22%3A%7B%22week.season%22%3A{season}%2C%22week.seasonType%22%3A%22POST%22%2C%22week.week%22%3A{week}%7D%7D")
+get_week_games <- function(token, season, week) {
+  
+  #for performing the queries
+  #treat super bowl as week 21
+  if (week > 17) {
+    season_type = 'POST'
+    week = week - 17
   } else {
-    query <- glue::glue("%7B%22%24query%22%3A%7B%22week.season%22%3A{season}%2C%22week.weekType%22%3A%22SB%22%7D%2C%22%24take%22%3A20%7D")
+    season_type = 'REG'
   }
+  
+  ##step 1: query the detail game info in v1
+  if (season_type == 'REG' | (season_type == 'POST' & week <= 3)) {
+    #for non- super bowl weeks
+    query_list = list(
+      week.season = as.integer(season),
+      week.seasonType = paste0(season_type),
+      week.week = week
+    )
+  } else {
+    #get super bowl
+    query_list = list(
+      week.season = as.integer(season),
+      week.weekType = "SB"
+    )
+  }
+  
+  query <- 
+    jsonlite::toJSON(
+      list("$query" = query_list
+      ),
+      auto_unbox = TRUE
+    ) %>%
+    utils::URLencode(reserved = TRUE)
   
   url <- paste0("https://api.nfl.com/v1/games?s=",query)
   request <- httr::GET(url = url, httr::add_headers(Authorization = glue::glue("Bearer {token}")))
   raw_data <- request %>%
     httr::content(as = "text", encoding = "UTF-8") %>%
     jsonlite::fromJSON(flatten = TRUE)
-  games_detail <- raw_data$data
+  games_detail <- raw_data$data %>%
+    filter(week.season == season)
 
-  #get this other stuff (needed for home & away team abbr)
+  ##step 2: query the other game info in v3
   if(between(week, 1, 17) & season_type == "REG") {
     url <- glue::glue("https://api.nfl.com/v3/shield/?query=query%7Bviewer%7Bleague%7Bgames(first%3A100%2Cweek_seasonValue%3A{season}%2Cweek_seasonType%3AREG%2Cweek_weekValue%3A{week}%2C)%7Bedges%7Bcursor%20node%7Bid%20esbId%20gameDetailId%20gameTime%20gsisId%20networkChannels%20radioLinks%20ticketUrl%20venue%7BfullName%20city%20state%7DawayTeam%7BnickName%20id%20abbreviation%20franchise%7BcurrentLogo%7Burl%7D%7D%7DhomeTeam%7BnickName%20id%20abbreviation%20franchise%7BcurrentLogo%7Burl%7D%7D%7Dslug%7D%7D%7D%7D%7D%7D&variables=null")
   } else if(between(week, 1, 4) & season_type == "POST") {
@@ -74,10 +107,10 @@ get_week_games <- function(token, season, season_type, week) {
 
 
 
-save_week <- function(token, season, season_type, week) {
+save_week <- function(token, season, week) {
   
   #get the game IDs for that week
-  game_ids <- get_week_games(token, season, season_type, week)
+  game_ids <- get_week_games(token, season, week)
   
   #save all the json
   for (x in 1:nrow(game_ids)) {
@@ -87,6 +120,8 @@ save_week <- function(token, season, season_type, week) {
 
 
 save_game <- function(token, df) {
+  
+  #game_id = '10160000-0576-153b-5ef4-ebfa5b22d002'
   
   game_id = df$game_id
   season = df$season
@@ -122,3 +157,88 @@ save_game <- function(token, df) {
   
   message(glue::glue('Saved {season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}'))
 }
+
+
+#function to tell which games have already been scraped
+#and are present in github repo
+get_scraped <- function(s) {
+  
+  schedule <- 
+    httr::GET(
+      url = "https://api.github.com/repos/guga31bb/nflfastR-data/contents/raw"
+    ) %>%
+    httr::content(as = "text", encoding = "UTF-8") %>%
+    jsonlite::fromJSON(flatten = TRUE) %>%
+    dplyr::select(name) %>%
+    dplyr::mutate(
+      name =
+        stringr::str_extract(
+          name, '[0-9]{4}\\_[0-9]{2}\\_[A-Z]{2,3}\\_[A-Z]{2,3}(?=.)'
+        ),
+      season =
+        stringr::str_extract(
+          name, '[0-9]{4}'
+        ),
+      week =
+        as.integer(stringr::str_extract(name, '(?<=\\_)[0-9]{2}(?=\\_)'))
+      ,
+      away_team =
+        stringr::str_extract(
+          name, '(?<=[0-9]\\_)[A-Z]{2,3}(?=\\_)'
+        ),
+      home_team =
+        stringr::str_extract(
+          name, '(?<=[A-Z]\\_)[A-Z]{2,3}'
+        ),
+      season_type = dplyr::if_else(week <= 17, 'REG', 'POST')
+    ) %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate(
+      season = as.integer(season)
+    ) %>%
+    dplyr::arrange(season, week) %>%
+    dplyr::rename(game_id = name) %>%
+    dplyr::distinct() %>%
+    dplyr::filter(season == s)
+  
+  return(schedule)
+}
+
+#function to get the completed games
+#that are not present in the data repo
+get_missing_games <- function(token, year, current_week) {
+  
+  server <- get_scraped(year) %>%
+    filter(week == current_week) %>%
+    arrange(game_id)
+  #testing only
+  #head(11)
+  
+  sched <- get_week_games(token, year, current_week) %>% select(
+    game_id,
+    season,
+    week,
+    home,
+    away,
+    season_type,
+    game_date,
+    game_status_phase
+  ) %>%
+    mutate(alt_game_id = as.character(glue::glue('{year}_{formatC(current_week, width=2, flag=\"0\")}_{away}_{home}'))) %>%
+    arrange(alt_game_id) %>%
+    filter(
+      stringr::str_detect(game_status_phase, 'FINAL')
+    )
+  
+  server_ids <- unique(server$game_id)
+  sched_ids <-unique(sched$alt_game_id)
+  
+  need_scrape <- sched[!sched_ids %in% server_ids,]
+  
+  message(glue::glue('{year} week {current_week}: you have {nrow(sched[sched_ids %in% server_ids,])} games and need {nrow(need_scrape)}'))
+  
+  return(need_scrape)
+  
+}
+
+

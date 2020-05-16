@@ -1,35 +1,31 @@
-library(tidyverse)
 source('R/scraping_functions.R')
-
-if (grepl("Documents",getwd())){
-  path <- ".."
-} else { ### server
-  path <- "/home/ben"
-}
+year = 2020
 
 ################################################################################
-### temporary storage
+### store raw data: ongoing seasons
 ###################################
-
-password = as.character(read.delim(glue::glue('{path}/gh.txt'))$pw)
 
 token <- get_token()
 
-#build 2019 data: reg
-nothing_in_here <- map(1:17, function(x) {
-  save_week(token, 2019, 'REG', x)
-  message(glue::glue('Finished week {x}'))
-  Sys.sleep(3)
-})
+dates <- read_csv(url("http://www.habitatring.com/games.csv")) %>%
+  filter(season == year) %>%
+  group_by(week) %>%
+  summarize(first_game = min(gameday), last_game = max(gameday)) %>%
+  mutate(
+    first_date = first_game,
+    last_date = dplyr::lead(first_game) - 1,
+    first_date = if_else(week == 1, as.Date('2020-05-16'), first_date),
+    last_date = if_else(is.na(last_date), as.Date('2050-05-16'), last_date)
+  ) %>%
+  select(week, first_date, last_date)
 
-#build 2019 data: post
-#right now this fails for super bowls
-nothing_in_here <- map(1:4, function(x) {
-  save_week(token, 2019, 'POST', x)
-  message(glue::glue('Finished week {x}'))
-  Sys.sleep(3)
-})
+current_week = dates %>% filter(Sys.Date() >= first_date & Sys.Date() <= last_date) %>% pull(week)
 
+#get missing games and save them
+missing <- get_missing_games(token, year, current_week)
+for (x in 1:nrow(missing)) {
+  save_game(token, missing %>% slice(x))
+}
 
 #thanks to Tan for the code
 data_repo <- git2r::repository('./') # Set up connection to repository folder
