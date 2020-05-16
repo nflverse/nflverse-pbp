@@ -41,13 +41,9 @@ sched <- fast_scraper_schedules(y) %>%
   select(game_id, week, season_type)
 
 pbp <- sched %>% pull(game_id) %>%
-  fast_scraper(source = 'gc', pp = TRUE) %>%
-  mutate(game_id = as.numeric(game_id)) %>%
+  fast_scraper(source = 'api', pp = TRUE) %>%
   clean_pbp() %>%
   fix_fumbles()
-  #need to do this because week & season_type aren't in gc data
-  #if we find a live-updating RS feed we can get rid of this part
-  left_join(sched, by = "game_id")
 
 write_csv(pbp, glue::glue('data/play_by_play_{y}.csv.gz'))
 saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))

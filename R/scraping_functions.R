@@ -214,15 +214,16 @@ get_missing_games <- function(token, year, current_week) {
   #testing only
   #head(11)
   
-  sched <- get_week_games(token, year, current_week) %>% select(
-    game_id,
-    season,
-    week,
-    home,
-    away,
-    season_type,
-    game_date,
-    game_status_phase
+  sched <- get_week_games(token, year, current_week) %>% 
+    select(
+      game_id,
+      season,
+      week,
+      home,
+      away,
+      season_type,
+      game_date,
+      game_status_phase
   ) %>%
     mutate(alt_game_id = as.character(glue::glue('{year}_{formatC(current_week, width=2, flag=\"0\")}_{away}_{home}'))) %>%
     arrange(alt_game_id) %>%
