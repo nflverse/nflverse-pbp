@@ -12,8 +12,13 @@ if (month(Sys.Date()) > 4) {
 #testing only
 #year = 2020
 
+#connect to repo and make sure it's up to date
+data_repo <- git2r::repository('./') # Set up connection to repository folder
+git2r::pull(data_repo) # pull repo (and pray there are no merge commits)
+
+
 ################################################################################
-### store raw data: ongoing seasons
+### store raw json data: ongoing seasons
 ###################################
 
 dates <- readRDS(url("http://www.habitatring.com/games.rds")) %>%
@@ -40,7 +45,6 @@ for (x in 1:nrow(missing)) {
 }
 
 #thanks to Tan for the code
-data_repo <- git2r::repository('./') # Set up connection to repository folder
 git2r::add(data_repo,'raw/*') # add specific files to staging of commit
 git2r::commit(data_repo,message = glue::glue("Updating data at {Sys.time()}")) # commit the staged files with the chosen message
 git2r::pull(data_repo) # pull repo (and pray there are no merge commits)

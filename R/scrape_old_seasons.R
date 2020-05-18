@@ -2,9 +2,7 @@ source('R/scraping_functions.R')
 
 
 ################################################################################
-### store raw data: completed seasons
-### once this is finalized, should only need to run this one time
-### and then once more for each additional season that has finished
+### store raw json data: completed seasons
 ###################################
 
 token <- get_token()
@@ -32,7 +30,6 @@ for (season in 2001:2019) {
   })
   
 }
-
 
 #thanks to Tan for the code
 data_repo <- git2r::repository('./') # Set up connection to repository folder
