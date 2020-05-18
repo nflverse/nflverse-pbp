@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lubridate)
 
 if (grepl("Documents",getwd())){
   path <- ".."
@@ -144,14 +145,14 @@ save_game <- function(token, df) {
   #shoving all the gathered info from games here
   raw_data$sched_info <- df
   
-  saveRDS(raw_data, glue::glue('raw/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.rds'))
+  saveRDS(raw_data, glue::glue('raw/{season}/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.rds'))
   
   # save compressed JSON so non-R users can work with it
   request %>%
     httr::content(as = "text", encoding = "UTF-8") %>%
     jsonlite::fromJSON(flatten = TRUE) %>%
-    jsonlite::write_json(glue::glue('raw/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.json'))
-  system(glue::glue('gzip raw/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.json'))
+    jsonlite::write_json(glue::glue('raw/{season}/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.json'))
+  system(glue::glue('gzip raw/{season}/{season}_{formatC(week, width=2, flag=\"0\")}_{away}_{home}.json'))
   # read those files with
   # df <- jsonlite::fromJSON("raw/{alt_game_id}.json.gz")
   
@@ -163,13 +164,14 @@ save_game <- function(token, df) {
 #and are present in github repo
 get_scraped <- function(s) {
   
-  schedule <- 
-    httr::GET(
-      url = "https://api.github.com/repos/guga31bb/nflfastR-data/contents/raw"
+  #testing only
+  #s = 2005
+
+  schedule <- list.files(glue::glue('raw/{s}')) %>%
+    as_tibble() %>%
+    dplyr::rename(
+      name = value
     ) %>%
-    httr::content(as = "text", encoding = "UTF-8") %>%
-    jsonlite::fromJSON(flatten = TRUE) %>%
-    dplyr::select(name) %>%
     dplyr::mutate(
       name =
         stringr::str_extract(
@@ -192,7 +194,6 @@ get_scraped <- function(s) {
         ),
       season_type = dplyr::if_else(week <= 17, 'REG', 'POST')
     ) %>%
-    tibble::as_tibble() %>%
     dplyr::mutate(
       season = as.integer(season)
     ) %>%
