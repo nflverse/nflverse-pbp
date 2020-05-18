@@ -12,7 +12,17 @@ token <- get_token()
 #rebuild old seasons
 #2000 seems to have games with missing plays section
 #so let's start with 2001
+
+i = 1
 for (season in 2001:2019) {
+  
+  #scrape 3 seasons before getting a new token
+  if (i == 4) {
+    token <- get_token()
+    i = 1
+  } else {
+    i = i + 1
+  }
   
   #build data: reg + post
   walk(1:21, function(x) {
