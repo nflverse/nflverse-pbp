@@ -70,14 +70,15 @@ message(paste('Successfully uploaded to GitHub values as of',Sys.time())) # I ha
 
 ## STEP 4: Scrape schedule
 games <- readRDS(url("https://github.com/leesharpe/nfldata/blob/master/data/games.rds?raw=true")) %>%
-  select(game_id, season, game_type, week, gameday, weekday, gametime, away_team, home_team, old_game_id)
+  select(game_id, season, game_type, week, gameday, weekday, gametime, away_team, 
+         home_team, away_score, home_score, home_result = result, stadium, location, roof, surface, old_game_id)
 
 max_s <- max(games$season)
 min_s <- min(games$season)
 
 write_season_schedule <- function(s){
   g <- games %>% filter(season == s)
-  saveRDS(g, glue::glue('raw/schedules/sched_{s}.rds'))
+  saveRDS(g, glue::glue('schedules/sched_{s}.rds'))
 }
 
 walk(min_s:max_s, write_season_schedule)
