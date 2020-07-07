@@ -29,11 +29,6 @@ legacy_pbp <- purrr::map_df(seasons, function(x) {
 })
 
 legacy_pbp_players <- legacy_pbp %>%
-  filter(
-    passer_id %in% both_eras$teamPlayers.gsisId |
-      rusher_id %in% both_eras$teamPlayers.gsisId |
-      receiver_id %in% both_eras$teamPlayers.gsisId
-  ) %>%
   select(season, week, home_team, away_team, play_id, ends_with("player_id")) %>%
   mutate(week = if_else(week == 22, 21, week)) %>%
   pivot_longer(ends_with("player_id"),
@@ -75,7 +70,11 @@ both_eras_id_map <- legacy_pbp_players %>%
     by = c("gsis_id" = "teamPlayers.gsisId")
   ) %>%
   select(full_name, gsis_id, new_id) %>%
+  filter(gsis_id %in% both_eras$teamPlayers.gsisId) %>% 
   arrange(gsis_id)
+
+saveRDS(both_eras_id_map, "roster-data/legacy_id_map.rds")
+write_csv(both_eras_id_map, "roster-data/legacy_id_map.csv")
 
 # both_eras_id_map %>%
 #   group_by(gsis_id) %>%
