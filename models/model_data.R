@@ -173,9 +173,13 @@ find_game_next_score_half <- function(pbp_dataset) {
 #read in data from data repo
 pbp_data <- purrr::map_df(1999 : 2019, function(x) {
   readRDS(
-    url(
-      glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.rds")
-    )
+    
+    # from repo
+    # url(glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.rds"))
+    
+    # local
+    glue::glue("data/play_by_play_{x}.rds")
+    
   ) %>% filter(season_type == 'REG')
 }) %>%
   mutate(
@@ -228,6 +232,7 @@ pbp_data <- pbp_data %>%
     receiver_player_name,
     pass_location,
     air_yards,
+    yards_after_catch,
     complete_pass, incomplete_pass, interception,
     qb_hit,
     extra_point_result,
