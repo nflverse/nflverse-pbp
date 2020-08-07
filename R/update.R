@@ -22,7 +22,8 @@ write_season <- function(y) {
     pull(game_id) %>%
     fast_scraper(pp = TRUE, dir = path) %>%
     clean_pbp() %>%
-    add_qb_epa()
+    add_qb_epa() %>%
+    add_xyac()
   
   message(glue::glue('Year {y}: writing to file'))
   
@@ -51,7 +52,8 @@ sched <- fast_scraper_schedules(y) %>%
 pbp <- sched %>% pull(game_id) %>%
   fast_scraper(pp = TRUE) %>%
   clean_pbp() %>%
-  add_qb_epa()
+  add_qb_epa() %>%
+  add_xyac()
 
 write_csv(pbp, glue::glue('data/play_by_play_{y}.csv.gz'))
 saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))
