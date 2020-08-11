@@ -27,9 +27,16 @@ write_season <- function(y) {
   
   message(glue::glue('Year {y}: writing to file'))
   
+  # rds
   saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))
+  # csv.gz
   write_csv(pbp, glue::glue('data/play_by_play_{y}.csv.gz'))
+  # .parquet
   arrow::write_parquet(pbp, glue::glue('data/play_by_play_{y}.parquet'))
+  # .zip
+  write_csv(pbp, glue::glue("data/play_by_play_{x}.csv"))
+  utils::zip(glue::glue("data/play_by_play_{x}.zip"), c(glue::glue("data/play_by_play_{x}.csv")))
+  file.remove(glue::glue("data/play_by_play_{x}.csv"))
   
 }
 
