@@ -12,4 +12,4 @@ games <- readRDS(url("https://github.com/leesharpe/nfldata/blob/master/data/game
   
 g <- games %>% dplyr::filter(season == current_season)
 
-saveRDS(g, glue::glue('schedules/sched_{s}.rds'))
+saveRDS(g, glue::glue('schedules/sched_{current_season}.rds'))
