@@ -3,25 +3,18 @@ on:
     # runs every 5 minutes starting from minute 0 of every hour
     - cron:  '0/5 * * * *'
 
-
-name: Update Data Repo
+name: Update Schedule Data
 
 jobs:
   render:
-    name: Update Data
+    name: Update Schedules
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v1
-      - name: Install remotes and nflfastR
-        run: |
-          install.packages("remotes")
-          remotes::install_local(".")
-          remotes::install_github("mrcaseb/nflfastR")
-        shell: Rscript {0}
       - name: Install necessary packages
         run: |
-          install.packages(c("tidyverse", "lubridate", "glue", "janitor"), dependencies = TRUE)
+          install.packages(c("dplyr", "lubridate", "glue", "magrittr"), dependencies = TRUE)
         shell: Rscript {0}
       - name: Run update script
         run: Rscript -e 'source("R/update_sched.R")'
