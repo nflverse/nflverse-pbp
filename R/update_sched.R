@@ -1,3 +1,5 @@
+'%>%' <- magrittr::`%>%`
+
 current_season <- dplyr::if_else(
   lubridate::month(lubridate::today("GMT")) >= 9,
   lubridate::year(lubridate::today("GMT")) ,
