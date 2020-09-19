@@ -10,14 +10,14 @@ y <- dplyr::if_else(
 )
 
 # get existing pbp
-existing_pbp <- readRDS(url(
-    glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{y}.rds")
-  )) 
+# existing_pbp <- readRDS(url(
+#     glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{y}.rds")
+#   )) 
 
 # get IDs of scraped games
-already_scraped <- existing_pbp %>% 
-  dplyr::pull(game_id) %>%
-  unique()
+# already_scraped <- existing_pbp %>% 
+#   dplyr::pull(game_id) %>%
+#   unique()
 
 #get completed games
 sched <- readRDS(url(
@@ -27,18 +27,23 @@ sched <- readRDS(url(
   pull(game_id)
 
 # figure out which games we need
-need_scrape <- sched[!sched %in% already_scraped]
+# need_scrape <- sched[!sched %in% already_scraped]
 
 # grab the games we need
-new_pbp <- fast_scraper(need_scrape, pp = FALSE) %>%
+# new_pbp <- fast_scraper(need_scrape, pp = FALSE) %>%
+#   clean_pbp() %>%
+#   add_qb_epa() %>%
+#   add_xyac()
+# 
+# pbp <- bind_rows(
+#   existing_pbp,
+#   new_pbp
+# )
+
+pbp <- fast_scraper(sched, pp = TRUE) %>%
   clean_pbp() %>%
   add_qb_epa() %>%
   add_xyac()
-
-pbp <- bind_rows(
-  existing_pbp,
-  new_pbp
-)
 
 # rds
 saveRDS(pbp, glue::glue('data/play_by_play_{y}.rds'))
