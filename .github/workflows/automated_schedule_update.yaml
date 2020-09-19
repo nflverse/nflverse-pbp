@@ -1,7 +1,7 @@
 on:
   schedule:
-    # runs every 5 minutes starting from minute 0 of every hour
-    - cron:  '0/5 * * * *'
+    # runs every 5 minutes starting from minute 0 of every hour in jan, feb, aug-dec
+    - cron:  '0/5 * * 1,2,8-12 *'
 
 name: Update Schedule Data
 
