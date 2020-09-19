@@ -14,7 +14,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
       - name: Install necessary packages
         run: |
-          install.packages(c("dplyr", "lubridate", "glue", "magrittr"), dependencies = TRUE)
+          install.packages(c("dplyr", "lubridate", "glue", "magrittr", "callr"), dependencies = TRUE)
         shell: Rscript {0}
       - name: Run update script
         run: Rscript -e 'source("R/update_sched.R")'
@@ -22,5 +22,5 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git commit -am 'Updated Schedule' || echo "No changes to commit"
+          Rscript -e 'source("R/make_sched_commit.R")'
           git push origin master || echo "No changes to commit"
