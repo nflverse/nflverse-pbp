@@ -4,9 +4,9 @@ library(tidyverse)
 ## SCRAPE ONGOING SEASON
 
 y <- dplyr::if_else(
-  lubridate::month(lubridate::today("EST")) >= 9,
-  lubridate::year(lubridate::today("EST")) ,
-  lubridate::year(lubridate::today("EST")) - 1
+  lubridate::month(lubridate::today("America/New_York")) >= 9,
+  lubridate::year(lubridate::today("America/New_York")) ,
+  lubridate::year(lubridate::today("America/New_York")) - 1
 )
 
 # get existing pbp
