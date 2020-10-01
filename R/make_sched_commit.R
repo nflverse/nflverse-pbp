@@ -1,4 +1,4 @@
-message <- sprintf("Schedules updated %s (EST)", lubridate::now("EST"))
+message <- sprintf("Schedules updated %s (ET)", lubridate::now("America/New_York"))
 
 git <- function(..., echo_cmd = TRUE, echo = TRUE, error_on_status = TRUE) {
   callr::run("git", c(...),
