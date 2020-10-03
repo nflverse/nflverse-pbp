@@ -26,6 +26,8 @@ pbp <- purrr::map_df(seasons, function(x) {
   mutate(label = pass) %>%
   select(
     label,
+    # only for CV stuff in model readme in OSF
+    season,
     down,
     ydstogo,
     yardline_100,
