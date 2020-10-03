@@ -1,4 +1,5 @@
 
+## testing section: delete later
 seasons <- 2019
 pbp <- purrr::map_df(seasons, function(x) {
   readRDS(
@@ -11,7 +12,10 @@ pbp <- purrr::map_df(seasons, function(x) {
 pbp %>%
   add_xp() %>%
   select(desc, down, ydstogo, pass, xp, poe)
+## end testing section
+## 
 
+# to-do: set FG and punt to NA
 
 
 add_xp <- function(pbp) {
