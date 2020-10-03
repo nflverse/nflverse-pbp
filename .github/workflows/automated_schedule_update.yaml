@@ -1,0 +1,29 @@
+on:
+  schedule:
+    # runs every 15 minutes starting from minute 0 of every hour in jan, feb, aug-dec
+    - cron:  '0/15 * * 1,2,8-12 *'
+  push:
+    paths:
+      - R/update_sched.R
+
+name: Update Schedule Data
+
+jobs:
+  render:
+    name: Update Schedules
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - name: Install necessary packages
+        run: |
+          install.packages(c("dplyr", "lubridate", "glue", "magrittr", "callr"), dependencies = TRUE)
+        shell: Rscript {0}
+      - name: Run update script
+        run: Rscript -e 'source("R/update_sched.R")'
+      - name: Commit results
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          Rscript -e 'source("R/make_sched_commit.R")'
+          git push origin master || echo "No changes to commit"
