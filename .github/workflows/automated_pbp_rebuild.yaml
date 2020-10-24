@@ -1,0 +1,31 @@
+on:
+  push:
+    paths:
+      - R/update_all_seasons_pbp.R
+
+name: Update PBP Data
+
+jobs:
+  update:
+    name: Update PBP
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - name: Install remotes and nflfastR
+        run: |
+          install.packages("remotes")
+          remotes::install_github("mrcaseb/nflfastR")
+        shell: Rscript {0}
+      - name: Install necessary packages
+        run: |
+          install.packages(c("tidyverse", "lubridate", "glue", "arrow", "callr", "furrr"), dependencies = TRUE)
+        shell: Rscript {0}
+      - name: Run update script
+        run: Rscript -e 'source("R/update_all_seasons_pbp.R")'
+      - name: Commit results
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          Rscript -e 'source("R/make_pbp_commit.R")'
+          git push origin master || echo "No changes to commit"
