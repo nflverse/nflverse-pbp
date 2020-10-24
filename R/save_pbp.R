@@ -1,6 +1,6 @@
 library(dplyr)
 save_pbp <- function(season) {
-  ids <- fast_scraper_schedules(season) %>%
+  ids <- nflfastR::fast_scraper_schedules(season) %>%
     dplyr::filter(!is.na(home_result)) %>%
     dplyr::pull(game_id)
 
