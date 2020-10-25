@@ -9,4 +9,4 @@ y <- dplyr::if_else(
 purrr::walk(1999:y, save_pbp)
 
 # Any change in this script will trigger redownload of all seasons
-# starting in 1999
+# starting in 1999.
