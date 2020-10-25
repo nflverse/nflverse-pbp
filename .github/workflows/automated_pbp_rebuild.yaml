@@ -27,5 +27,6 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
+          git pull
           Rscript -e 'source("R/make_pbp_commit.R")'
           git push origin master || echo "No changes to commit"
