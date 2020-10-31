@@ -239,7 +239,8 @@ pbp_data <- pbp_data %>%
     field_goal_result,
     sp,
     Winner,
-    spread_line
+    spread_line,
+    total_line
   )
 
 #for doing calibation etc
