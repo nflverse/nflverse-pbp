@@ -1,0 +1,20 @@
+name: Merge Upstream
+on: 
+  schedule:
+    - cron: '0 17,18,19,20,21,22,23,0 * * *'
+
+jobs:
+  merge-upstream:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: upstream
+          fetch-depth: 0 
+      - name: Merge Upstream
+        uses: exions/merge-upstream@v1
+        with:
+          upstream: guga31bb/nflfastR-data
+          upstream-branch: master
+          branch: upstream
