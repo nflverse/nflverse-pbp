@@ -1,7 +1,7 @@
 name: Merge Upstream
 on: 
   schedule:
-    - cron: '0 17,18,19,20,21,22,23,0 * * *'
+    - cron: '0 22,23,0,1,2,3,4,5 * * *'
 
 jobs:
   merge-upstream:
