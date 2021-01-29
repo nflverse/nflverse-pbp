@@ -13,6 +13,12 @@ save_pbp <- function(season) {
     readr::write_csv(pbp, glue::glue('data/play_by_play_{season}.csv.gz'))
     # .parquet
     arrow::write_parquet(pbp, glue::glue('data/play_by_play_{season}.parquet'))
+    # .qs
+    qs::qsave(pbp, glue::glue('data/play_by_play_{season}.qs'),
+              preset = "custom",
+              algorithm = "zstd_stream",
+              compress_level = 22,
+              shuffle_control = 15)
     # .zip
     readr::write_csv(pbp, glue::glue("data/play_by_play_{season}.csv"))
     utils::zip(glue::glue("data/play_by_play_{season}.zip"), c(glue::glue("data/play_by_play_{season}.csv")))
