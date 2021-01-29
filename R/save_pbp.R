@@ -6,7 +6,12 @@ save_pbp <- function(season) {
 
   pbp <- nflfastR::build_nflfastR_pbp(ids, pp = TRUE)
 
-  if(length(unique(pbp$game_id)) == length(ids)){
+  n_pbp_ids <- length(unique(pbp$game_id))
+  n_ids <- length(ids)
+
+  if( (season == 1999 & n_pbp_ids == n_ids - 1L) |
+      (season == 2000 & n_pbp_ids == n_ids - 2L) |
+      (season >= 2001 & n_pbp_ids == n_ids)){
     # rds
     saveRDS(pbp, glue::glue('data/play_by_play_{season}.rds'))
     # csv.gz
