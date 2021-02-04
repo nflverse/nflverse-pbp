@@ -22,7 +22,7 @@ jobs:
         shell: Rscript {0}
       - name: Install necessary packages
         run: |
-          install.packages(c("tidyverse", "lubridate", "glue", "arrow", "callr", "furrr"), dependencies = TRUE)
+          install.packages(c("tidyverse", "lubridate", "glue", "arrow", "callr", "furrr", "qs"), dependencies = TRUE)
         shell: Rscript {0}
       - name: Run update script
         run: Rscript -e 'source("R/update_current_season_pbp.R")'
@@ -30,5 +30,6 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
+          git pull
           Rscript -e 'source("R/make_pbp_commit.R")'
           git push origin master || echo "No changes to commit"
