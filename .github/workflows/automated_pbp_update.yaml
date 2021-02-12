@@ -22,7 +22,7 @@ jobs:
         shell: Rscript {0}
       - name: Install necessary packages
         run: |
-          install.packages(c("tidyverse", "lubridate", "glue", "arrow", "callr", "furrr", "qs", "gsisdecoder"), dependencies = TRUE)
+          install.packages(c("tidyverse", "lubridate", "glue", "arrow", "callr", "purrr", "qs", "gsisdecoder"), dependencies = TRUE)
         shell: Rscript {0}
       - name: Run update script
         run: Rscript -e 'source("R/update_current_season_pbp.R")'
