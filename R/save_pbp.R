@@ -1,10 +1,11 @@
 library(dplyr)
 save_pbp <- function(season) {
+  future::plan("multisession")
   ids <- nflfastR::fast_scraper_schedules(season) %>%
     dplyr::filter(!is.na(home_result)) %>%
     dplyr::pull(game_id)
 
-  pbp <- nflfastR::build_nflfastR_pbp(ids, pp = TRUE)
+  pbp <- nflfastR::build_nflfastR_pbp(ids)
 
   n_pbp_ids <- length(unique(pbp$game_id))
   n_ids <- length(ids)
