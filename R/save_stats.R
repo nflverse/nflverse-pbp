@@ -1,6 +1,10 @@
 `%>%` <- magrittr::`%>%`
 future::plan("multisession")
-pbp_df <- nflfastR::load_pbp(1999:nflfastR:::most_recent_season(), qs = TRUE)
+
+pbp_df <- furrr::future_map_dfr(1999:nflfastR:::most_recent_season(), function(x){
+  qs::qread(glue::glue("data/play_by_play_{x}.qs"))
+})
+
 stats_df <- nflfastR::calculate_player_stats(pbp_df, weekly = TRUE)
 
 # rds
