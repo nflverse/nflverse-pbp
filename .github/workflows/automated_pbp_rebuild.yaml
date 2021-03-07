@@ -1,6 +1,6 @@
 on: workflow_dispatch
 
-name: Update PBP Data
+name: PBP Rebuild
 
 jobs:
   update:
