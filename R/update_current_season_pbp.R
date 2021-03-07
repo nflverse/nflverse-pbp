@@ -6,5 +6,5 @@ y <- dplyr::if_else(
   lubridate::year(lubridate::today("America/New_York")) - 1
 )
 
+future::plan("multisession")
 save_pbp(y)
-# 

@@ -1,6 +1,6 @@
 library(dplyr)
 save_pbp <- function(season) {
-  future::plan("multisession")
+
   ids <- nflfastR::fast_scraper_schedules(season) %>%
     dplyr::filter(!is.na(home_result)) %>%
     dplyr::pull(game_id)
@@ -29,7 +29,7 @@ save_pbp <- function(season) {
     readr::write_csv(pbp, glue::glue("data/play_by_play_{season}.csv"))
     utils::zip(glue::glue("data/play_by_play_{season}.zip"), c(glue::glue("data/play_by_play_{season}.csv")))
     file.remove(glue::glue("data/play_by_play_{season}.csv"))
-    closeAllConnections()
+
     usethis::ui_done("Saved {season} pbp data.")
   } else {
     usethis::ui_warn(c(
