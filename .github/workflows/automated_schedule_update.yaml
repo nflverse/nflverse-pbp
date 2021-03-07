@@ -2,9 +2,7 @@ on:
   schedule:
     # runs every 15 minutes starting from minute 0 of every hour in jan, feb, aug-dec
     - cron:  '0/15 * * 1,2,8-12 *'
-  push:
-    paths:
-      - R/update_sched.R
+  workflow_dispatch:
 
 name: Update Schedule Data
 

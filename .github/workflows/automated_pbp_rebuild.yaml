@@ -1,13 +1,10 @@
-on:
-  push:
-    paths:
-      - R/update_all_seasons_pbp.R
+on: workflow_dispatch
 
 name: Update PBP Data
 
 jobs:
   update:
-    name: Update PBP
+    name: PBP Rebuild
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
