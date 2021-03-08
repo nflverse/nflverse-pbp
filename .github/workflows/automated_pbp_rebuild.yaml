@@ -12,11 +12,11 @@ jobs:
       - name: Install remotes and nflfastR
         run: |
           install.packages("remotes")
-          remotes::install_github("mrcaseb/nflfastR", dependencies = TRUE, type = "binary")
+          remotes::install_github("mrcaseb/nflfastR", dependencies = TRUE, type = "both")
         shell: Rscript {0}
       - name: Install necessary packages
         run: |
-          install.packages(c("readr", "arrow", "callr"), dependencies = TRUE, type = "binary")
+          install.packages(c("readr", "arrow", "callr"), dependencies = TRUE, type = "both")
         shell: Rscript {0}
       - name: Run update script
         run: Rscript -e 'source("R/update_all_seasons_pbp.R")'
