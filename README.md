@@ -1,5 +1,5 @@
 # nflfastR-data
-NFL play-by-play data scraped from the [`nflfastR` package](https://github.com/mrcaseb/nflfastR) going back to 1999. Each season contains both regular season and postseason data, with `game_type` or `week` denoting which.
+NFL play-by-play data scraped from the [`nflfastR` package](https://github.com/nflverse/nflfastR) going back to 1999. Each season contains both regular season and postseason data, with `game_type` or `week` denoting which.
 
 Data are stored in the data folder, available as either compressed csv (.csv.gz) .rds, or .parquet.
 
@@ -31,7 +31,7 @@ If you don't want to use the above nflfastR function you can download the binary
 # define which seasons shall be loaded
 seasons <- 2018:2020
 pbp <- purrr::map_dfr(seasons, function(x) {
-  con <- url(glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data",
+  con <- url(glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data",
                         "/master/data/play_by_play_{x}.rds"))
   dat <- readRDS(con)
   close(con)
@@ -46,7 +46,7 @@ However, if you want to load the compressed csv data run this:
 seasons <- 2018:2020
 pbp <- purrr::map_df(seasons, function(x) {
   readr::read_csv(
-    glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.csv.gz")
+    glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.csv.gz")
   )
 })
 ```
@@ -56,7 +56,7 @@ Or you can read .parquet like this:
 # define which seasons shall be loaded
 seasons <- 2018:2020
 pbp <- purrr::map_dfr(seasons, function(x) {
-  download.file(glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.parquet"), "tmp.parquet")
+  download.file(glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.parquet"), "tmp.parquet")
   df <- arrow::read_parquet("tmp.parquet")
   return(df)
 }
@@ -78,7 +78,7 @@ data = pd.DataFrame()
 
 for i in YEARS:  
     #low_memory=False eliminates a warning
-    i_data = pd.read_csv('https://github.com/guga31bb/nflfastR-data/blob/master/data/' \
+    i_data = pd.read_csv('https://github.com/nflverse/nflfastR-data/blob/master/data/' \
                          'play_by_play_' + str(i) + '.csv.gz?raw=True',
                          compression='gzip', low_memory=False)
 
