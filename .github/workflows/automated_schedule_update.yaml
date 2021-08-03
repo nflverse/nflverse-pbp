@@ -1,7 +1,7 @@
 on:
   schedule:
-    # runs every 15 minutes starting from minute 0 of every hour in jan, feb, aug-dec
-    - cron:  '0/15 * * 1,2,8-12 *'
+    # runs every 15 minutes starting from minute 0 of every hour in jan, feb, sep-dec
+    - cron:  '0/15 * * 1,2,9-12 *'
   workflow_dispatch:
 
 name: Update Schedule Data
