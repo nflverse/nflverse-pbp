@@ -30,10 +30,10 @@ save_pbp <- function(season) {
     utils::zip(glue::glue("data/play_by_play_{season}.zip"), c(glue::glue("data/play_by_play_{season}.csv")))
     file.remove(glue::glue("data/play_by_play_{season}.csv"))
 
-    usethis::ui_done("Saved {season} pbp data.")
+    cli::cli_alert_success("Saved {season} pbp data.")
   } else {
-    usethis::ui_warn(c(
-      "The number of finished games is not equal to the number of games in the loaded data.",
+    cli::cli_alert_warning(c(
+      "The number of finished games is not equal to the number of games in the loaded data.\n",
       "Will not push this corrupted dataset to the repo."
       ))
   }

@@ -1,7 +1,7 @@
 on:
   schedule:
-    # runs every day at 9:00 AM UTC in jan, feb, aug-dec
-    - cron:  '0 9 * 1,2,8-12 *'
+    # runs every day at 9:00 AM UTC in jan, feb, sep-dec
+    - cron:  '0 9 * 1,2,9-12 *'
   workflow_dispatch:
 
 name: Update Current Season PBP and Stats
