@@ -3,65 +3,12 @@ NFL play-by-play data scraped from the [`nflfastR` package](https://github.com/n
 
 Data are stored in the data folder, available as either compressed csv (.csv.gz) .rds, or .parquet.
 
-___
+This is one of several data repositories that are available and primarily concentrates on play-by-play data.  You may also be interested in:
 
-## Load data using R
+- [nflverse/nfldata](https://github.com/nflverse/nfldata) - a repository maintained by Lee Sharpe (containing games, team colours, and more)
+- [nflverse/nflfastR-roster](https://github.com/nflverse/nflfastR-roster) - a repo of rosters, injuries, and depth charts updated on a daily basis
 
-### nflfastR
-
-The easiest way to load the play-by-play data in R is a new function in nflfastR v4.0. So after running
-
-```r
-install.packages("nflfastR")
-```
-
-all you need to do to load a bunch of seasons is
-
-```r
-# define which seasons shall be loaded
-seasons <- 2018:2020
-pbp <- nflfastR::load_pbp(seasons)
-```
-
-### Without nflfastR
-
-If you don't want to use the above nflfastR function you can download the binary .rds format. The following example shows how to load the seasons 2018 to 2020 (binded into a single dataframe).
-
-```R
-# define which seasons shall be loaded
-seasons <- 2018:2020
-pbp <- purrr::map_dfr(seasons, function(x) {
-  con <- url(glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data",
-                        "/master/data/play_by_play_{x}.rds"))
-  dat <- readRDS(con)
-  close(con)
-  dat
-})
-
-```
-
-However, if you want to load the compressed csv data run this:
-```R
-# define which seasons shall be loaded
-seasons <- 2018:2020
-pbp <- purrr::map_df(seasons, function(x) {
-  readr::read_csv(
-    glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.csv.gz")
-  )
-})
-```
-
-Or you can read .parquet like this:
-```R
-# define which seasons shall be loaded
-seasons <- 2018:2020
-pbp <- purrr::map_dfr(seasons, function(x) {
-  download.file(glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.parquet"), "tmp.parquet")
-  df <- arrow::read_parquet("tmp.parquet")
-  return(df)
-}
-)
-```
+Keeping track of which file lives where can be tricky - the best way to download the data is the [nflreadr R package](https://nflreadr.nflverse.com)!
 
 ___
 
