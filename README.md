@@ -7,12 +7,12 @@ ___
 
 ## Load data using R
 
-### nflfastR
+### nflreadr
 
-The easiest way to load the play-by-play data in R is a new function in nflfastR v4.0. So after running
+The easiest way to load the play-by-play data in R is with `nflreadr`. So after running
 
 ```r
-install.packages("nflfastR")
+install.packages("nflreadr")
 ```
 
 all you need to do to load a bunch of seasons is
@@ -20,54 +20,13 @@ all you need to do to load a bunch of seasons is
 ```r
 # define which seasons shall be loaded
 seasons <- 2018:2020
-pbp <- nflfastR::load_pbp(seasons)
+pbp <- nflreadr::load_pbp(seasons)
 ```
-
-### Without nflfastR
-
-If you don't want to use the above nflfastR function you can download the binary .rds format. The following example shows how to load the seasons 2018 to 2020 (binded into a single dataframe).
-
-```R
-# define which seasons shall be loaded
-seasons <- 2018:2020
-pbp <- purrr::map_dfr(seasons, function(x) {
-  con <- url(glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data",
-                        "/master/data/play_by_play_{x}.rds"))
-  dat <- readRDS(con)
-  close(con)
-  dat
-})
-
-```
-
-However, if you want to load the compressed csv data run this:
-```R
-# define which seasons shall be loaded
-seasons <- 2018:2020
-pbp <- purrr::map_df(seasons, function(x) {
-  readr::read_csv(
-    glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.csv.gz")
-  )
-})
-```
-
-Or you can read .parquet like this:
-```R
-# define which seasons shall be loaded
-seasons <- 2018:2020
-pbp <- purrr::map_dfr(seasons, function(x) {
-  download.file(glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.parquet"), "tmp.parquet")
-  df <- arrow::read_parquet("tmp.parquet")
-  return(df)
-}
-)
-```
-
 ___
 
 ## Load data using Python
 
-If you are using Python you can load the compressed csv data. The following example written by [Deryck](https://twitter.com/Deryck_SG) (thanks a lot!) loads the seasons 2017 to 2019 (binded into a single pandas dataframe) as well as rosters (from 2000 to latest season):
+If you are using Python (or anything else that isn't R) you can load the compressed csv data. The following example written by [Deryck](https://twitter.com/Deryck_SG) (thanks a lot!) loads the seasons 2017 to 2019 (binded into a single pandas dataframe) as well as rosters (from 2000 to latest season):
 ```Python
 import pandas as pd 
 
