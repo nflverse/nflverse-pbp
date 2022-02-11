@@ -1,0 +1,20 @@
+on: workflow_dispatch
+
+name: PBP Rebuild
+
+jobs:
+  update:
+    name: PBP Rebuild
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - name: Install pak and nflfastR
+        run: |
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+          pak::pkg_system_requirements("nflfastR", sudo = TRUE, execute = TRUE)
+          pak::pak(c("nflverse/nflfastR", dependencies = TRUE)
+          pak::pak(c("readr","arrow","callr", "ropensci/piggyback", "nflverse/nflverse-data"))
+        shell: Rscript {0}
+      - name: Run update script
+        run: Rscript -e 'source("R/update_all_seasons_pbp.R")'

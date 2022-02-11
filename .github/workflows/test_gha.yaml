@@ -1,0 +1,40 @@
+on: workflow_dispatch
+
+name: GHA test
+
+jobs:
+  gha_test:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v1
+        with:
+           cache-version: 1
+           extra-packages: |
+            nflverse/nflfastR
+            nflverse/nflreadr
+
+      - name: Run update script
+        run: |
+          writeLines(paste0("export NFLFASTR_VERSION=",as.character(packageVersion("nflfastR"))),".ver")
+          writeLines(as.character(runif(1)),"blob.txt")
+        shell: Rscript {0}
+
+      - name: Commit results
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          source .ver
+          git pull
+          git add blob.txt
+          git commit -m "GHA test on `date` using nflfastR version $NFLFASTR_VERSION"  || echo "No changes to commit"
+          git push origin master || echo "No changes to commit"

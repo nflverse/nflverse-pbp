@@ -1,0 +1,10 @@
+^LICENSE\.md$
+^data$
+^R$
+^legacy\-data$
+^models$
+^man$
+^schedules$
+^wordmarks$
+^.*\.Rproj$
+^\.Rproj\.user$
