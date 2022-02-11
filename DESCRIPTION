@@ -31,7 +31,6 @@ Imports:
     dplyr (>= 1.0.7),
     gsisdecoder,
     magrittr (>= 2.0.1),
-    nflversedata,
     future (>= 1.21.0),
     furrr (>= 0.2.2),
     glue (>= 1.4.2)
