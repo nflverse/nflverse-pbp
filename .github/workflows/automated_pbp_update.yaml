@@ -24,6 +24,7 @@ jobs:
             nflverse/nflfastR
             nflverse/nflreadr
             nflverse/nflverse-data
+            ropensci/piggyback
 
       - name: Run pbp update
         run: Rscript -e 'source("R/update_current_season_pbp.R")'
