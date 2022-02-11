@@ -9,4 +9,4 @@ y <- dplyr::if_else(
 future::plan("multisession")
 save_pbp(y)
 
-list.files("data", pattern = paste0("play_by_play_",y)) |> nflversedata::nflverse_upload("pbp", dir = "data")
+list.files("data", pattern = paste0("play_by_play_",y), full.names = TRUE) |> nflversedata::nflverse_upload("pbp")

@@ -9,6 +9,6 @@ y <- dplyr::if_else(
 future::plan("multisession")
 purrr::walk(1999:y, save_pbp)
 
-list.files("data", pattern = "play_by_play") |> nflversedata::nflverse_upload("pbp", dir = "data")
+list.files("data", pattern = "play_by_play", full.names = TRUE) |> nflversedata::nflverse_upload("pbp")
 
 
