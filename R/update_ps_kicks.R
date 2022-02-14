@@ -1,7 +1,7 @@
 update_kicks <- function(season){
   `%>%` <- magrittr::`%>%`
   cli::cli_process_start("Calculating kicking stats for {season}")
-  pbp <- qs::qread(paste0("data/play_by_play_",season,".qs"))
+  pbp <- nflreadr::load_pbp(season)
 
   base_kicks <- pbp %>%
     dplyr::filter(field_goal_attempt == 1 | extra_point_attempt == 1) %>%
@@ -96,6 +96,10 @@ update_kicks <- function(season){
       .after = fg_blocked_distance
     )
 
+  attr(full_kicks, "nflverse_timestamp") <- Sys.time()
+  attr(full_kicks, "nflverse_type") <- "player stats: kicking"
+  attr(full_kicks, "nflfastR_version") <- packageVersion("nflfastR")
+
   saveRDS(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.rds'))
   # csv.gz
   readr::write_csv(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.csv.gz'))
@@ -116,6 +120,10 @@ combine_kicks <- function(season = 1999:nflreadr:::most_recent_season()){
   cli::cli_process_start("Combining kicking data into one file")
 
   full_kicks <- purrr::map_dfr(season,~qs::qread(paste0("data/player_stats_kicking/player_stats_kicking_",.x,".qs")))
+
+  attr(full_kicks, "nflverse_timestamp") <- Sys.time()
+  attr(full_kicks, "nflverse_type") <- "player stats: kicking"
+  attr(full_kicks, "nflfastR_version") <- packageVersion("nflfastR")
 
   saveRDS(full_kicks, glue::glue('data/player_stats_kicking.rds'))
   # csv.gz
