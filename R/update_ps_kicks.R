@@ -127,9 +127,9 @@ combine_kicks <- function(season = 1999:nflreadr:::most_recent_season()){
   attr(full_kicks, "nflfastR_version") <- packageVersion("nflfastR")
 
   saveRDS(full_kicks, glue::glue('data/player_stats_kicking.rds'))
-  
+
   # csv.gz
-  data.table::fwrite(full_ckicks, glue::glue('data/player_stats_kicking.csv.gz')) 
+  data.table::fwrite(full_kicks, glue::glue('data/player_stats_kicking.csv.gz'))
   readr::write_csv(full_kicks, glue::glue('data/player_stats_kicking.csv.gz'))
   # .parquet
   arrow::write_parquet(full_kicks, glue::glue('data/player_stats_kicking.parquet'))
@@ -143,7 +143,7 @@ combine_kicks <- function(season = 1999:nflreadr:::most_recent_season()){
   cli::cli_process_done()
 
 }
-
+# purrr::map(1999:2021,update_kicks)
 update_kicks(nflreadr:::most_recent_season())
 combine_kicks()
 
