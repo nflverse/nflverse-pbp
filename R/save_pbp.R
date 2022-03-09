@@ -13,11 +13,11 @@ save_pbp <- function(season) {
   attr(pbp, "nflverse_timestamp") <- Sys.time()
   attr(pbp, "nflverse_type") <- "play by play"
   attr(pbp, "nflfastR_version") <- packageVersion("nflfastR")
-  
+
   if( (season == 1999 & n_pbp_ids == n_ids - 1L) |
       (season == 2000 & n_pbp_ids == n_ids - 2L) |
       (season >= 2001 & n_pbp_ids == n_ids)){
-    
+
     # rds
     saveRDS(pbp, glue::glue('data/play_by_play_{season}.rds'))
     # csv
@@ -33,9 +33,7 @@ save_pbp <- function(season) {
               compress_level = 22,
               shuffle_control = 15)
     # .zip
-    readr::write_csv(pbp, glue::glue("data/play_by_play_{season}.csv"))
     utils::zip(glue::glue("data/play_by_play_{season}.zip"), c(glue::glue("data/play_by_play_{season}.csv")))
-    file.remove(glue::glue("data/play_by_play_{season}.csv"))
 
     cli::cli_alert_success("Saved {season} pbp data.")
   } else {
