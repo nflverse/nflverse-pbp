@@ -29,7 +29,7 @@ ps_season <- function(season){
   cli::cli_process_done(msg_done = "Finished calculate_player_stats for {season}!")
   return(NULL)
 }
-# purrr::map(1999:2020, ps_season)
+# purrr::map(1999:2021, ps_season)
 ps_season(nflreadr:::most_recent_season())
 
 cli::cli_alert_info("Saving combined data...")
