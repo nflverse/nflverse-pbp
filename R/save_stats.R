@@ -15,6 +15,7 @@ ps_season <- function(season){
   attr(ps, "nflfastR_version") <- packageVersion("nflfastR")
 
   saveRDS(ps,glue::glue("data/player_stats/player_stats_{season}.rds"))
+  data.table::fwrite(ps,glue::glue("data/player_stats/player_stats_{season}.csv"))
   readr::write_csv(ps,glue::glue("data/player_stats/player_stats_{season}.csv.gz"))
   arrow::write_parquet(ps,glue::glue("data/player_stats/player_stats_{season}.parquet"))
   qs::qsave(ps, glue::glue('data/player_stats/player_stats_{season}.qs'),
@@ -42,6 +43,8 @@ attr(stats_df, "nflfastR_version") <- packageVersion("nflfastR")
 
 # rds
 saveRDS(stats_df, 'data/player_stats.rds')
+# csv
+data.table::fwrite(stats_df, 'data/player_stats.csv')
 # csv.gz
 readr::write_csv(stats_df, 'data/player_stats.csv.gz')
 # .parquet
@@ -55,6 +58,7 @@ qs::qsave(stats_df, 'data/player_stats.qs',
 
 c("data/player_stats.qs",
   "data/player_stats.rds",
+  "data/player_stats.csv",
   "data/player_stats.csv.gz",
   "data/player_stats.parquet") |>
   nflversedata::nflverse_upload("player_stats")
