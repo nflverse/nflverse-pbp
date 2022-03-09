@@ -20,6 +20,8 @@ save_pbp <- function(season) {
     
     # rds
     saveRDS(pbp, glue::glue('data/play_by_play_{season}.rds'))
+    # csv
+    data.table::fwrite(pbp, glue::glue("data/play_by_play_{season}.csv"))
     # csv.gz
     readr::write_csv(pbp, glue::glue('data/play_by_play_{season}.csv.gz'))
     # .parquet
