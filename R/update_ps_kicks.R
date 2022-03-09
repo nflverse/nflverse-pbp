@@ -102,6 +102,7 @@ update_kicks <- function(season){
 
   saveRDS(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.rds'))
   # csv.gz
+  data.table::fwrite(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.csv'))
   readr::write_csv(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.csv.gz'))
   # .parquet
   arrow::write_parquet(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.parquet'))
@@ -126,7 +127,9 @@ combine_kicks <- function(season = 1999:nflreadr:::most_recent_season()){
   attr(full_kicks, "nflfastR_version") <- packageVersion("nflfastR")
 
   saveRDS(full_kicks, glue::glue('data/player_stats_kicking.rds'))
+  
   # csv.gz
+  data.table::fwrite(full_ckicks, glue::glue('data/player_stats_kicking.csv.gz')) 
   readr::write_csv(full_kicks, glue::glue('data/player_stats_kicking.csv.gz'))
   # .parquet
   arrow::write_parquet(full_kicks, glue::glue('data/player_stats_kicking.parquet'))
@@ -146,6 +149,7 @@ combine_kicks()
 
 c("data/player_stats_kicking.qs",
   "data/player_stats_kicking.rds",
+  "data/player_stats_kicking.csv",
   "data/player_stats_kicking.csv.gz",
   "data/player_stats_kicking.parquet") |>
   nflversedata::nflverse_upload("player_stats")
