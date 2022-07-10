@@ -23,10 +23,14 @@ jobs:
             nflverse/nflfastR
             nflverse/nflreadr
             nflverse/nflverse-data
+            nflverse/ngsscrapR
             ropensci/piggyback
 
       - name: Run pbp update
         run: Rscript -e 'source("R/update_current_season_pbp.R")'
+
+      - name: Run participation update
+        run: Rscript -e 'source("R/save_participation.R")'
 
       - name: Run player_stats script
         run: Rscript -e 'source("R/save_stats.R")'
