@@ -1,17 +1,15 @@
 on:
-  schedule:
-    # runs every day at 9:00 AM UTC in jan, feb, sep-dec
-    - cron:  '0 9 * 1,2,9-12 *'
   workflow_dispatch:
 
-name: update_current_season_pbp_and_stats
+name: rebuild_participation
 
 jobs:
   update:
-    name: update_pbp
+    name: rebuild_participation
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      NFLVERSE_REBUILD: true
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v2
@@ -20,20 +18,10 @@ jobs:
         with:
            cache-version: 1
            extra-packages: |
-            nflverse/nflfastR
             nflverse/nflreadr
-            nflverse/nflverse-data
             nflverse/ngsscrapR
+            nflverse/nflverse-data
             ropensci/piggyback
-
-      - name: Run pbp update
-        run: Rscript -e 'source("R/update_current_season_pbp.R")'
 
       - name: Run participation update
         run: Rscript -e 'source("R/save_participation.R")'
-
-      - name: Run player_stats script
-        run: Rscript -e 'source("R/save_stats.R")'
-
-      - name: Run player_stats_kicking script
-        run: Rscript -e 'source("R/update_ps_kicks.R")'
