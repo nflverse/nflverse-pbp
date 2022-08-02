@@ -32,6 +32,7 @@ pbp_participation <-
       ) |>
       dplyr::select(
         old_game_id = game_id,
+        week,
         play_id,
         possession_team,
         players_on_play,
@@ -50,19 +51,20 @@ pbp_participation <-
         na_matches = "never"
       ) |>
       dplyr::left_join(
-        # ideally season + week join?
-        nflreadr::load_rosters(season) |> dplyr::select(gsis_id, team),
-        by = "gsis_id",
+        nflreadr::load_rosters_weekly(season) |> dplyr::select(gsis_id, week, team = team_abbr),
+        by = c("gsis_id","week"),
         na_matches = "never"
       ) |>
       dplyr::group_by(old_game_id, play_id,
                       possession_team,
                       offense_formation, offense_personnel,
                       defenders_in_box, defense_personnel, number_of_pass_rushers
-                      ) |>
+      ) |>
       dplyr::summarise(
         offense_players = gsis_id[possession_team == team] |> na.omit() |> paste(collapse = ";"),
-        defense_players = gsis_id[possession_team != team] |> na.omit() |> paste(collapse = ";")
+        n_offense = gsis_id[possession_team == team] |> na.omit() |> length(),
+        defense_players = gsis_id[possession_team != team] |> na.omit() |> paste(collapse = ";"),
+        n_defense = gsis_id[possession_team != team] |> na.omit() |> length()
       ) |>
       dplyr::ungroup()
 
@@ -76,16 +78,13 @@ pbp_participation <-
     )
 
     cli::cli_process_done()
-
   }
 
-
-# future::plan(future::multisession)
-pbp_participation(nflreadr:::most_recent_season())
-
-# do this manually to build releases
-#
-# purrr::walk(
-#   c(2016:2020),
-#   pbp_participation
-# )
+if(Sys.getenv("NFLVERSE_REBUILD","false")=="true"){
+  purrr::walk(
+    c(2016:nflreadr:::most_recent_season()),
+    pbp_participation
+  )
+} else {
+  pbp_participation(nflreadr:::most_recent_season())
+}
