@@ -49,7 +49,7 @@ pbp_participation <-
         nflreadr::load_players() |>
           dplyr::select(gsis_id,gsis_it_id) |>
           dplyr::mutate_at("gsis_it_id", as.character),
-        by= c("players_on_play" = "gsis_it_id"),
+        by= c("players_on_play2" = "gsis_it_id"),
         na_matches = "never"
       ) |>
       dplyr::left_join(
