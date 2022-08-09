@@ -36,13 +36,15 @@ pbp_participation <-
         play_id,
         possession_team,
         players_on_play,
+        players_on_play2 = players_on_play,
         offense_formation = offense_offense_formation,
         offense_personnel,
         defenders_in_box = defense_defenders_in_the_box,
         defense_personnel,
         number_of_pass_rushers = defense_number_of_pass_rushers
       ) |>
-      tidyr::separate_rows(players_on_play,sep = ";") |>
+      tidyr::separate_rows(players_on_play2, sep = ";" 
+      ) |>
       dplyr::left_join(
         nflreadr::load_players() |>
           dplyr::select(gsis_id,gsis_it_id) |>
@@ -58,7 +60,8 @@ pbp_participation <-
       dplyr::group_by(old_game_id, play_id,
                       possession_team,
                       offense_formation, offense_personnel,
-                      defenders_in_box, defense_personnel, number_of_pass_rushers
+                      defenders_in_box, defense_personnel, number_of_pass_rushers,
+                      players_on_play
       ) |>
       dplyr::summarise(
         offense_players = gsis_id[possession_team == team] |> na.omit() |> paste(collapse = ";"),
