@@ -22,11 +22,10 @@ jobs:
            extra-packages: |
             nflverse/nflreadr,
             nflverse/nflfastR,
-            nflverse/gsisdecoder,
-            readr
+            nflverse/gsisdecoder
 
       - name: Run multiple laterals update
-        run: Rscript -e 'source("R/save_multiple_laterals.R")'
+        run: Rscript -e 'source("R/update_multiple_laterals.R")'
 
       - name: Commit results
         run: |

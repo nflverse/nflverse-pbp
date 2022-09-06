@@ -33,7 +33,8 @@ Imports:
     magrittr (>= 2.0.1),
     future (>= 1.21.0),
     furrr (>= 0.2.2),
-    glue (>= 1.4.2)
+    glue (>= 1.4.2),
+    waldo (>= 0.4.0)
 Remotes:
   nflverse/nflfastR,
   nflverse/nflreadr,
