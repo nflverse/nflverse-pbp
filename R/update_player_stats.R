@@ -19,8 +19,11 @@ ps_season <- function(season){
   return(invisible(NULL))
 }
 
-purrr::map(1999:nflreadr:::most_recent_season(), ps_season)
-# ps_season(nflreadr:::most_recent_season())
+if(Sys.getenv("NFLVERSE_REBUILD","false")=="true"){
+  purrr::map(1999:nflreadr:::most_recent_season(), ps_season)
+} else {
+  ps_season(nflreadr:::most_recent_season())
+}
 
 cli::cli_alert_info("Saving combined data...")
 
