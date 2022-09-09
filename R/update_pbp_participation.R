@@ -48,12 +48,13 @@ pbp_participation <-
       dplyr::left_join(
         nflreadr::load_players() |>
           dplyr::select(gsis_id,gsis_it_id) |>
-          dplyr::mutate_at("gsis_it_id", as.character),
+          dplyr::mutate_at("gsis_it_id", as.character) |> 
+          dplyr::distinct(),
         by= c("players_on_play2" = "gsis_it_id"),
         na_matches = "never"
       ) |>
       dplyr::left_join(
-        nflreadr::load_rosters_weekly(season) |> dplyr::select(gsis_id, week, team = team_abbr),
+        nflreadr::load_rosters_weekly(season) |> dplyr::select(gsis_id, week, team = team_abbr) |> dplyr::distinct(),
         by = c("gsis_id","week"),
         na_matches = "never"
       ) |>
