@@ -2,17 +2,21 @@ ids <- nflreadr::load_schedules(nflreadr::most_recent_season()) |>
   dplyr::filter(!is.na(result)) |>
   dplyr::pull(game_id)
 
-pbp <- nflfastR::build_nflfastR_pbp(ids)
+# nfl changed player IDs in the 2022 season
+# we probably can't decode them
+should_decode <- ifelse(nflreadr::most_recent_season() <= 2021, TRUE, FALSE)
+
+pbp <- nflfastR::build_nflfastR_pbp(ids, decode = should_decode)
 
 n_pbp_ids <- length(unique(pbp$game_id))
 n_ids <- length(ids)
 
-if( 
+if(
   (season == 1999 & n_pbp_ids == n_ids - 1L) |
   (season == 2000 & n_pbp_ids == n_ids - 2L) |
   (season >= 2001 & n_pbp_ids == n_ids)
 ){
-  
+
   nflversedata::nflverse_save(
     data_frame = pbp,
     file_name =  glue::glue("play_by_play_{season}"),
@@ -20,7 +24,7 @@ if(
     release_tag = "pbp",
     file_types = c("rds","csv","parquet","qs", "csv.gz")
   )
-  
+
   cli::cli_alert_success("Saved {season} pbp data.")
 } else {
   cli::cli_alert_warning(c(
