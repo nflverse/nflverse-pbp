@@ -24,6 +24,7 @@ jobs:
             nflverse/nflreadr
             nflverse/nflverse-data
             nflverse/ngsscrapR
+            nflverse/fastrmodels
             ropensci/piggyback
 
       - name: Run pbp update
