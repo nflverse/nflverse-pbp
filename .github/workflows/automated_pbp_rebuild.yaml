@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      NFLVERSE_REBUILD: true
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v2
@@ -20,13 +21,14 @@ jobs:
             nflverse/nflfastR
             nflverse/nflreadr
             nflverse/nflverse-data
+            nflverse/fastrmodels
             ropensci/piggyback
 
       - name: Run pbp update
-        run: Rscript -e 'source("R/update_all_seasons_pbp.R")'
+        run: Rscript -e 'source("R/update_pbp.R")'
 
       - name: Run player_stats script
-        run: Rscript -e 'source("R/save_stats.R")'
+        run: Rscript -e 'source("R/update_player_stats.R")'
 
       - name: Run player_stats_kicking script
-        run: Rscript -e 'source("R/update_ps_kicks.R")'
+        run: Rscript -e 'source("R/update_player_stats_kicking.R")'
