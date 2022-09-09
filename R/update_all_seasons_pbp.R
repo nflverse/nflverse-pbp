@@ -1,8 +1,35 @@
-source("R/save_pbp.R")
+save_pbp <- function(season) {
+    ids <- nflreadr::load_schedules(season) |>
+      dplyr::filter(!is.na(result)) |>
+      dplyr::pull(game_id)
+
+    pbp <- nflfastR::build_nflfastR_pbp(ids)
+
+    n_pbp_ids <- length(unique(pbp$game_id))
+    n_ids <- length(ids)
+
+    if( 
+      (season == 1999 & n_pbp_ids == n_ids - 1L) |
+      (season == 2000 & n_pbp_ids == n_ids - 2L) |
+      (season >= 2001 & n_pbp_ids == n_ids)
+    ){
+
+      nflversedata::nflverse_save(
+        data_frame = pbp,
+        file_name =  glue::glue("play_by_play_{season}"),
+        nflverse_type = "play by play data",
+        release_tag = "pbp",
+        file_types = c("rds","csv","parquet","qs", "csv.gz")
+      )
+
+      cli::cli_alert_success("Saved {season} pbp data.")
+    } else {
+      cli::cli_alert_warning(c(
+        "The number of finished games is not equal to the number of games in the loaded data.\n",
+        "Will not push this corrupted dataset to the repo."
+      ))
+    }
+ }
+
 future::plan(future::multisession)
 purrr::walk(1999:nflreadr::most_recent_season(), save_pbp)
-
-list.files("data", pattern = "play_by_play", full.names = TRUE) |>
-  nflversedata::nflverse_upload("pbp")
-
-
