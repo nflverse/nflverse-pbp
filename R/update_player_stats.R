@@ -5,7 +5,6 @@ ps_season <- function(season){
     nflfastR::calculate_player_stats(weekly = TRUE)
 
   attr(ps, "nflfastR_version") <- packageVersion("nflfastR")
-
   
   nflversedata::nflverse_save(
     data_frame = ps,
@@ -26,11 +25,10 @@ if(Sys.getenv("NFLVERSE_REBUILD","false")=="true"){
 }
 
 cli::cli_alert_info("Saving combined data...")
-
 stats_df <- purrr::map_dfr(
   1999:nflreadr::most_recent_season(), 
-  ~rds_from_url(glue::glue("https://github.com/nflverse/nflverse-data/releases/download/player_stats/player_stats_{.x}.rds"))
-  )
+  ~nflreadr::rds_from_url(glue::glue("https://github.com/nflverse/nflverse-data/releases/download/player_stats/player_stats_{.x}.rds"))
+)
 
 attr(stats_df, "nflfastR_version") <- packageVersion("nflfastR")
 
