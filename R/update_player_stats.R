@@ -27,7 +27,10 @@ if(Sys.getenv("NFLVERSE_REBUILD","false")=="true"){
 
 cli::cli_alert_info("Saving combined data...")
 
-stats_df <- nflreadr::load_player_stats(TRUE)
+stats_df <- purrr::map_dfr(
+  1999:nflreadr::most_recent_season(), 
+  ~rds_from_url(glue::glue("https://github.com/nflverse/nflverse-data/releases/download/player_stats/player_stats_{.x}.rds"))
+  )
 
 attr(stats_df, "nflfastR_version") <- packageVersion("nflfastR")
 
