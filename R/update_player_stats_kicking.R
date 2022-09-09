@@ -96,23 +96,14 @@ update_kicks <- function(season){
       .after = fg_blocked_distance
     )
 
-  attr(full_kicks, "nflverse_timestamp") <- Sys.time()
-  attr(full_kicks, "nflverse_type") <- "player stats: kicking"
   attr(full_kicks, "nflfastR_version") <- packageVersion("nflfastR")
-
-  saveRDS(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.rds'))
-  # csv.gz
-  data.table::fwrite(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.csv'))
-  readr::write_csv(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.csv.gz'))
-  # .parquet
-  arrow::write_parquet(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.parquet'))
-  # .qs
-  qs::qsave(full_kicks, glue::glue('data/player_stats_kicking/player_stats_kicking_{season}.qs'),
-            preset = "custom",
-            algorithm = "zstd_stream",
-            compress_level = 22,
-            shuffle_control = 15)
-
+  
+  nflversedata::nflverse_save(
+    full_kicks,
+    file_name = glue::glue("player_stats_kicking_{season}"),
+    nflverse_type = "player stats: kicking"
+    )
+  
   cli::cli_process_done(msg_done = "Calculating kicking stats for {season}...done! {Sys.time()}")
 }
 
@@ -120,38 +111,22 @@ combine_kicks <- function(season = 1999:nflreadr:::most_recent_season()){
 
   cli::cli_process_start("Combining kicking data into one file")
 
-  full_kicks <- purrr::map_dfr(season,~qs::qread(paste0("data/player_stats_kicking/player_stats_kicking_",.x,".qs")))
-
-  attr(full_kicks, "nflverse_timestamp") <- Sys.time()
-  attr(full_kicks, "nflverse_type") <- "player stats: kicking"
+  full_kicks <- nflreadr::load_player_stats(TRUE, stat_type = "kicking")
   attr(full_kicks, "nflfastR_version") <- packageVersion("nflfastR")
 
-  saveRDS(full_kicks, glue::glue('data/player_stats_kicking.rds'))
-
-  # csv.gz
-  data.table::fwrite(full_kicks, glue::glue('data/player_stats_kicking.csv.gz'))
-  readr::write_csv(full_kicks, glue::glue('data/player_stats_kicking.csv.gz'))
-  # .parquet
-  arrow::write_parquet(full_kicks, glue::glue('data/player_stats_kicking.parquet'))
-  # .qs
-  qs::qsave(full_kicks, glue::glue('data/player_stats_kicking.qs'),
-            preset = "custom",
-            algorithm = "zstd_stream",
-            compress_level = 22,
-            shuffle_control = 15)
-
+  nflversedata::nflverse_save(
+    full_kicks,
+    file_name = "player_stats_kicking",
+    nflverse_type = "player stats: kicking"
+    )
+  
   cli::cli_process_done()
-
 }
-# purrr::map(1999:2021,update_kicks)
-update_kicks(nflreadr:::most_recent_season())
+
+if(Sys.getenv("NFLVERSE_REBUILD","false")=="true"){
+  purrr::map(1999:nflreadr:::most_recent_season(), update_kicks)
+} else {
+  update_kicks(nflreadr:::most_recent_season())
+}
+
 combine_kicks()
-
-c("data/player_stats_kicking.qs",
-  "data/player_stats_kicking.rds",
-  "data/player_stats_kicking.csv",
-  "data/player_stats_kicking.csv.gz",
-  "data/player_stats_kicking.parquet") |>
-  nflversedata::nflverse_upload("player_stats")
-
-list.files("data/player_stats_kicking", full.names = TRUE) |> nflversedata::nflverse_upload("player_stats")
