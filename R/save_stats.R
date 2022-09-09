@@ -1,67 +1,37 @@
-rm(list = ls())
-gc()
-`%>%` <- magrittr::`%>%`
-
-cli::cli_alert_info("Read pbp...")
-
 ps_season <- function(season){
   cli::cli_process_start("Starting calculate_player_stats for {season}!")
 
-  ps <- qs::qread(glue::glue("data/play_by_play_{season}.qs")) |>
+  ps <- nflreadr::load_pbp(season) |>
     nflfastR::calculate_player_stats(weekly = TRUE)
 
-  attr(ps, "nflverse_timestamp") <- Sys.time()
-  attr(ps, "nflverse_type") <- "player stats: offense"
   attr(ps, "nflfastR_version") <- packageVersion("nflfastR")
 
-  saveRDS(ps,glue::glue("data/player_stats/player_stats_{season}.rds"))
-  data.table::fwrite(ps,glue::glue("data/player_stats/player_stats_{season}.csv"))
-  readr::write_csv(ps,glue::glue("data/player_stats/player_stats_{season}.csv.gz"))
-  arrow::write_parquet(ps,glue::glue("data/player_stats/player_stats_{season}.parquet"))
-  qs::qsave(ps, glue::glue('data/player_stats/player_stats_{season}.qs'),
-            preset = "custom",
-            algorithm = "zstd_stream",
-            compress_level = 22,
-            shuffle_control = 15)
-  rm(ps)
-  gc()
+  
+  nflversedata::nflverse_save(
+    data_frame = ps,
+    file_name =  glue::glue("player_stats_{season}"),
+    nflverse_type = "player stats: offense",
+    release_tag = "player_stats",
+    file_types = c("rds","csv","parquet","qs", "csv.gz")
+  )
 
-  cli::cli_process_done(msg_done = "Finished calculate_player_stats for {season}!")
-  return(NULL)
+  cli::cli_process_done(msg_done = "Finished calculating player weekly stats for {season}!")
+  return(invisible(NULL))
 }
-# purrr::map(1999:2021, ps_season)
-ps_season(nflreadr:::most_recent_season())
+
+purrr::map(1999:nflreadr:::most_recent_season(), ps_season)
+# ps_season(nflreadr:::most_recent_season())
 
 cli::cli_alert_info("Saving combined data...")
 
-stats_df <- purrr::map_dfr(1999:nflreadr:::most_recent_season(),
-                           ~qs::qread(glue::glue("data/player_stats/player_stats_{.x}.qs")))
+stats_df <- nflreadr::load_player_stats(TRUE)
 
-attr(stats_df, "nflverse_timestamp") <- Sys.time()
-attr(stats_df, "nflverse_type") <- "player stats: offense"
 attr(stats_df, "nflfastR_version") <- packageVersion("nflfastR")
 
-# rds
-saveRDS(stats_df, 'data/player_stats.rds')
-# csv
-data.table::fwrite(stats_df, 'data/player_stats.csv')
-# csv.gz
-readr::write_csv(stats_df, 'data/player_stats.csv.gz')
-# .parquet
-arrow::write_parquet(stats_df, 'data/player_stats.parquet')
-# .qs
-qs::qsave(stats_df, 'data/player_stats.qs',
-          preset = "custom",
-          algorithm = "zstd_stream",
-          compress_level = 22,
-          shuffle_control = 15)
-
-c("data/player_stats.qs",
-  "data/player_stats.rds",
-  "data/player_stats.csv",
-  "data/player_stats.csv.gz",
-  "data/player_stats.parquet") |>
-  nflversedata::nflverse_upload("player_stats")
-
-list.files("data/player_stats", full.names = TRUE) |>
-  nflversedata::nflverse_upload("player_stats")
+  nflversedata::nflverse_save(
+    data_frame = stats_df,
+    file_name =  glue::glue("player_stats"),
+    nflverse_type = "player stats: offense",
+    release_tag = "player_stats",
+    file_types = c("rds","csv","parquet","qs", "csv.gz")
+  )
