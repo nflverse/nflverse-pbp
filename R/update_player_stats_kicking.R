@@ -101,7 +101,8 @@ update_kicks <- function(season){
   nflversedata::nflverse_save(
     full_kicks,
     file_name = glue::glue("player_stats_kicking_{season}"),
-    nflverse_type = "player stats: kicking"
+    nflverse_type = "player stats: kicking",
+    release_tag = "player_stats"
     )
   
   cli::cli_process_done(msg_done = "Calculating kicking stats for {season}...done! {Sys.time()}")
@@ -117,7 +118,8 @@ combine_kicks <- function(season = 1999:nflreadr:::most_recent_season()){
   nflversedata::nflverse_save(
     full_kicks,
     file_name = "player_stats_kicking",
-    nflverse_type = "player stats: kicking"
+    nflverse_type = "player stats: kicking",
+    release_tag = "player_stats"
     )
   
   cli::cli_process_done()
