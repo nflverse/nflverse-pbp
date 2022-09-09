@@ -24,4 +24,4 @@ jobs:
             ropensci/piggyback
 
       - name: Run participation update
-        run: Rscript -e 'source("R/save_participation.R")'
+        run: Rscript -e 'source("R/update_pbp_participation.R")'
