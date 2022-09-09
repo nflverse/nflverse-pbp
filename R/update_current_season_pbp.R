@@ -2,11 +2,7 @@ ids <- nflreadr::load_schedules(nflreadr::most_recent_season()) |>
   dplyr::filter(!is.na(result)) |>
   dplyr::pull(game_id)
 
-# nfl changed player IDs in the 2022 season
-# we probably can't decode them
-should_decode <- ifelse(nflreadr::most_recent_season() <= 2021, TRUE, FALSE)
-
-pbp <- nflfastR::build_nflfastR_pbp(ids, decode = should_decode)
+pbp <- nflfastR::build_nflfastR_pbp(ids)
 
 n_pbp_ids <- length(unique(pbp$game_id))
 n_ids <- length(ids)
