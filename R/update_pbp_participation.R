@@ -9,7 +9,7 @@ pbp_participation <-
     ) |>
       dplyr::filter(!is.na(score_phase)) |>
       dplyr::transmute(
-        game_id,
+        game_id = as.character(game_id),
         nflverse_game_id = paste(season,
                                  stringr::str_pad(week,2,side = "left",0),
                                  visitor_team_abbr,
@@ -20,7 +20,7 @@ pbp_participation <-
     cli::cli_alert_info("Scraping participation data for {season}...")
     obtain_plays <- function() {
       p <- progressr::progressor(steps = length(games$game_id))
-      plays <- purrr::map_dfr(games$game_id,
+      plays <- furrr::future_map_dfr(games$game_id,
                               ngsscrapR::scrape_plays |>
                                 nflreadr::progressively(p)
       )
@@ -82,7 +82,7 @@ pbp_participation <-
       ) |>
       dplyr::ungroup() |>
       dplyr::left_join(
-        games, by = c("old_game_id" = "game_id")
+        games |> dplyr::mutate(old_game_id = as.character(game_id)), by = c("old_game_id" = "old_game_id")
       ) |>
       dplyr::select(
         nflverse_game_id,
@@ -114,6 +114,7 @@ pbp_participation <-
   }
 
 if (Sys.getenv("NFLVERSE_REBUILD", "false") == "true") {
+  future::plan(future::multisession)
   purrr::walk(c(2016:nflreadr:::most_recent_season()),
               pbp_participation)
 } else {
