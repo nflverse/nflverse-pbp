@@ -1,32 +1,40 @@
 pbp_participation <-
   function(season) {
     stopifnot(season >= 2016)
-    
+
     cli::cli_alert_info("Obtaining schedules...")
     games <- dplyr::bind_rows(
       ngsscrapR::scrape_schedule(season, seasonType = "REG"),
       ngsscrapR::scrape_schedule(season, seasonType = "POST")
-    )
-    
+    ) |>
+      dplyr::filter(!is.na(score_phase)) |>
+      dplyr::transmute(
+        game_id = as.character(game_id),
+        nflverse_game_id = paste(season,
+                                 stringr::str_pad(week,2,side = "left",0),
+                                 visitor_team_abbr,
+                                 home_team_abbr,
+                                 sep = "_")
+      )
+
     cli::cli_alert_info("Scraping participation data for {season}...")
     obtain_plays <- function() {
       p <- progressr::progressor(steps = length(games$game_id))
-      plays <- purrr::map_dfr(games$game_id,
-                              \(x) {
-                                pbp <- ngsscrapR::scrape_plays(x)
-                                p()
-                                return(pbp)
-                              })
+      plays <- furrr::future_map_dfr(games$game_id,
+                              ngsscrapR::scrape_plays |>
+                                nflreadr::progressively(p)
+      )
       return(plays)
     }
-    
+
     progressr::with_progress({
       plays <- obtain_plays()
     })
-    
+
     plays <- plays |>
-      dplyr::mutate(game_id = as.character(game_id),
-                    players_on_play2 = players_on_play) |>
+      dplyr::mutate(
+        game_id = as.character(game_id),
+        players_on_play2 = players_on_play) |>
       dplyr::select(
         old_game_id = game_id,
         week,
@@ -72,21 +80,41 @@ pbp_participation <-
         n_defense = gsis_id[possession_team != team] |> na.omit() |> length(),
         .groups = "drop"
       ) |>
-      dplyr::ungroup()
-    
+      dplyr::ungroup() |>
+      dplyr::left_join(
+        games |> dplyr::mutate(old_game_id = as.character(game_id)), by = c("old_game_id" = "old_game_id")
+      ) |>
+      dplyr::select(
+        nflverse_game_id,
+        old_game_id,
+        play_id,
+        possession_team,
+        offense_formation,
+        offense_personnel,
+        defenders_in_box,
+        defense_personnel,
+        number_of_pass_rushers,
+        players_on_play,
+        offense_players,
+        defense_players,
+        n_offense,
+        n_defense
+      )
+
     cli::cli_process_start("Uploading participation data to nflverse-data")
-    
+
     nflversedata::nflverse_save(
       data_frame = plays,
       file_name = paste0("pbp_participation_", season),
       nflverse_type = "pbp participation",
       release_tag = "pbp_participation"
     )
-    
+
     cli::cli_process_done()
   }
 
 if (Sys.getenv("NFLVERSE_REBUILD", "false") == "true") {
+  future::plan(future::multisession)
   purrr::walk(c(2016:nflreadr:::most_recent_season()),
               pbp_participation)
 } else {
