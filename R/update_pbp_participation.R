@@ -10,7 +10,11 @@ pbp_participation <-
       dplyr::filter(!is.na(score_phase)) |>
       dplyr::transmute(
         game_id,
-        nflverse_game_id = paste(season,stringr::str_pad(week,2,side = "left",0),visitor_team_abbr,home_team_abbr, sep = "_")
+        nflverse_game_id = paste(season,
+                                 stringr::str_pad(week,2,side = "left",0),
+                                 visitor_team_abbr,
+                                 home_team_abbr,
+                                 sep = "_")
       )
 
     cli::cli_alert_info("Scraping participation data for {season}...")
