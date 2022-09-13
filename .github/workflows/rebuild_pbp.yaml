@@ -1,5 +1,11 @@
 on:
   workflow_dispatch:
+    inputs:
+      full_rebuild:
+        description: 'Full Rebuild'
+        required: true
+        default: false
+        type: boolean
 
 name: rebuild_pbp
 
@@ -9,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
-      NFLVERSE_REBUILD: true
+      NFLVERSE_REBUILD: ${{ inputs.full_rebuild }}
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v2
