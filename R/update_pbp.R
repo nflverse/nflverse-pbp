@@ -4,7 +4,8 @@ save_pbp <- function(season) {
     dplyr::pull(game_id)
 
   pbp <- nflfastR::build_nflfastR_pbp(ids) |>
-    .patch_gsis_ids(season = season)
+    .patch_gsis_ids(season = season) |>
+    nflfastR::clean_pbp()
 
   n_pbp_ids <- length(unique(pbp$game_id))
   n_ids <- length(ids)
