@@ -35,6 +35,6 @@ jobs:
 
       - name: Run player_stats_kicking script
         run: Rscript -e 'source("R/update_player_stats_kicking.R")'
-            
+
       - name: Run participation update
         run: Rscript -e 'source("R/update_pbp_participation.R")'
