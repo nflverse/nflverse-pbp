@@ -1,7 +1,12 @@
 on:
   schedule:
     # runs every day at 5:00 AM UTC and 9:00 AM UTC in jan, feb, sep-dec
-    - cron:  '0 5,9 * 1,2,9-12 *'
+    - cron:  '0 9 * 1,2,9-12 *'
+    - cron:  '30 5 * 1,2,9-12 5'
+    - cron:  '30 22 * 1,2,9-12 0'
+    - cron:  '0 1 * 1,2,9-12 1'
+    - cron:  '0 5 * 1,2,9-12 1'
+    - cron:  '0 5 * 1,2,9-12 2'
   workflow_dispatch:
 
 name: update_current_season_pbp_and_stats
