@@ -46,7 +46,7 @@ build_pbp_patch <- function(season = nflreadr::most_recent_season()){
     file_name = glue::glue("pbp_patch_ids_{season}"),
     nflverse_type = "pbp gsis_id patch file",
     release_tag = "misc",
-    file_types = "rds")
+    file_types = c("rds", "csv"))
 
 }
 
