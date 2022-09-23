@@ -156,3 +156,5 @@ game_id,play_id,stat_id,type,yards,team_abbr,player_name,gsis_player_id
 2021_09_HOU_MIA,4462,23,lateral_receiving,2,HOU,B.Cooks,00-0031236
 2021_10_DET_PIT,5037,23,lateral_receiving,8,DET,T.Benson,00-0034930
 2021_10_DET_PIT,5037,23,lateral_receiving,2,DET,D.Swift,00-0036275
+2022_03_PIT_CLE,4183,23,lateral_receiving,-6,PIT,C.Claypool,00-0036326
+2022_03_PIT_CLE,4183,23,lateral_receiving,-4,PIT,N.Harris,00-0036893
