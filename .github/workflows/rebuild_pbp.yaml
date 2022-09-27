@@ -4,7 +4,7 @@ on:
       full_rebuild:
         description: 'Full Rebuild'
         required: true
-        default: true
+        default: false
         type: boolean
 
 name: rebuild_pbp
