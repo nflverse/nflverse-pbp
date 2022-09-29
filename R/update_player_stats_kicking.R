@@ -97,22 +97,29 @@ update_kicks <- function(season){
     )
 
   attr(full_kicks, "nflfastR_version") <- packageVersion("nflfastR")
-  
+
   nflversedata::nflverse_save(
     full_kicks,
     file_name = glue::glue("player_stats_kicking_{season}"),
     nflverse_type = "player stats: kicking",
     release_tag = "player_stats"
     )
-  
+
   cli::cli_process_done(msg_done = "Calculating kicking stats for {season}...done! {Sys.time()}")
 }
 
-combine_kicks <- function(season = 1999:nflreadr:::most_recent_season()){
+combine_kicks <- function(seasons = 1999:nflreadr:::most_recent_season()){
 
-  cli::cli_process_start("Combining kicking data into one file")
-
-  full_kicks <- nflreadr::load_player_stats(TRUE, stat_type = "kicking")
+  full_kicks <- purrr::map_dfr(seasons, function(s){
+    cli::cli_progress_step("Load kicking stats of {.val {s}}")
+    paste0(
+      "https://github.com/nflverse/nflverse-data/releases/download/player_stats/",
+      "player_stats_kicking_",
+      s,
+      ".rds"
+    ) |>
+      nflreadr::rds_from_url()
+  })
   attr(full_kicks, "nflfastR_version") <- packageVersion("nflfastR")
 
   nflversedata::nflverse_save(
@@ -121,8 +128,6 @@ combine_kicks <- function(season = 1999:nflreadr:::most_recent_season()){
     nflverse_type = "player stats: kicking",
     release_tag = "player_stats"
     )
-  
-  cli::cli_process_done()
 }
 
 if(Sys.getenv("NFLVERSE_REBUILD","false")=="true"){
