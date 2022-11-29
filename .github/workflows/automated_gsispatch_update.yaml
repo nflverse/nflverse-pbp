@@ -1,10 +1,10 @@
 on:
-  # schedule:
+   schedule:
     # runs every day at 5:00 AM UTC in jan, feb, sep-dec
-    # - cron:  '0 5 * 1,2,9-12 *'
-    repository_dispatch:
+     - cron:  '0 5 * 1,2,9-12 *'
+   repository_dispatch:
       types: [buildpatch]
-    workflow_dispatch:
+   workflow_dispatch:
 
 name: update_pbp_patch
 
