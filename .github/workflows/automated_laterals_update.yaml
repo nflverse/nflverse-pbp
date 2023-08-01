@@ -22,15 +22,8 @@ jobs:
            extra-packages: |
             nflverse/nflreadr,
             nflverse/nflfastR,
-            nflverse/gsisdecoder
+            nflverse/gsisdecoder,
+            nflverse/nflverse-data
 
       - name: Run multiple laterals update
         run: Rscript -e 'source("R/update_multiple_laterals.R")'
-
-      - name: Commit results
-        run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git add lateral_yards
-          git commit -m "Lateral data updated `date`" || echo "No changes to commit"
-          git push || echo "No changes to commit"
