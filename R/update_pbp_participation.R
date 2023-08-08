@@ -73,11 +73,13 @@ pbp_participation <-
         number_of_pass_rushers,
         players_on_play
       ) |>
+      # oak -> lv exception
+      dplyr::mutate(tmp_possession_team = nflreadr::clean_team_abbrs(possession_team, current_location = TRUE, keep_non_matches = TRUE)) |>
       dplyr::summarise(
-        offense_players = gsis_id[possession_team == team] |> na.omit() |> paste(collapse = ";"),
-        n_offense = gsis_id[possession_team == team] |> na.omit() |> length(),
-        defense_players = gsis_id[possession_team != team] |> na.omit() |> paste(collapse = ";"),
-        n_defense = gsis_id[possession_team != team] |> na.omit() |> length(),
+        offense_players = gsis_id[tmp_possession_team == team] |> na.omit() |> paste(collapse = ";"),
+        n_offense = gsis_id[tmp_possession_team == team] |> na.omit() |> length(),
+        defense_players = gsis_id[tmp_possession_team != team] |> na.omit() |> paste(collapse = ";"),
+        n_defense = gsis_id[tmp_possession_team != team] |> na.omit() |> length(),
         .groups = "drop"
       ) |>
       dplyr::ungroup() |>
