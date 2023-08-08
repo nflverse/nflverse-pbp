@@ -74,8 +74,7 @@ pbp_participation <-
         players_on_play
       ) |>
       # oak -> lv exception
-      dplyr::mutate(tmp_possession_team = dplyr::case_when(possession_team == "OAK" ~ "LV",
-                                                T ~ possession_team)) |>
+      dplyr::mutate(tmp_possession_team = nflreadr::clean_team_abbrs(possession_team, current_location = TRUE, keep_non_matches = TRUE)) |>
       dplyr::summarise(
         offense_players = gsis_id[tmp_possession_team == team] |> na.omit() |> paste(collapse = ";"),
         n_offense = gsis_id[tmp_possession_team == team] |> na.omit() |> length(),
