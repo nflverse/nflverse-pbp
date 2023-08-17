@@ -42,6 +42,9 @@ jobs:
       - name: Run player_stats script
         run: Rscript -e 'source("R/update_player_stats.R")'
 
+      - name: Run player_stats_defense script
+        run: Rscript -e 'source("R/update_player_stats_def.R")'
+
       - name: Run player_stats_kicking script
         run: Rscript -e 'source("R/update_player_stats_kicking.R")'
 
