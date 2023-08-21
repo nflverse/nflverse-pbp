@@ -1,43 +1,43 @@
-Package: nflfastr.data
+Package: nflversepbp
 Title: Data repository of player-level game data
 Version: 0.0.1
-Authors@R: 
-    c(person(given = "Ben",
-             family = "Baldwin",
-             role = c("aut")),
-      person(given = "Sebastian",
-             family = "Carl",
-             role = c("aut")),
-      person(given = "Tan",
-             family = "Ho",
-             role = c("aut", "cre"),
-             email = "tan@tanho.ca",
-             comment = c(ORCID = "0000-0001-8388-5155"))
-    )
+Authors@R: c(
+    person("Ben", "Baldwin", role = "aut"),
+    person("Sebastian", "Carl", role = "aut"),
+    person("Tan", "Ho", , "tan@tanho.ca", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-8388-5155"))
+  )
 Description: What the package does (one paragraph).
 License: CC BY 4.0
+URL: https://github.com/nflverse/nflverse-pbp
+BugReports: https://github.com/nflverse/nflverse-pbp/issues
+Imports: 
+    arrow (>= 5.0.0),
+    callr (>= 3.7.0),
+    cli (>= 3.0.0),
+    dplyr (>= 1.0.7),
+    furrr (>= 0.2.2),
+    future (>= 1.21.0),
+    glue (>= 1.4.2),
+    janitor,
+    magrittr (>= 2.0.1),
+    qs (>= 0.24.1),
+    readr (>= 2.0.0),
+    waldo (>= 0.4.0),
+    gsisdecoder,
+    ngsscrapR,
+    nflfastR,
+    nflreadr,
+    nflversedata,
+    fastrmodels
+Remotes:
+    nflfastR=nflverse/nflfastR,
+    ngsscrapR=nflverse/ngsscrapR,
+    nflreadr=nflverse/nflreadr,
+    nflversedata=nflverse/nflverse-data,
+    gsisdecoder=nflverse/gsisdecoder,
+    fastrmodels=nflverse/fastrmodels
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Imports: 
-    nflfastR (>= 4.1.0),
-    nflreadr (>= 1.1.0),
-    cli (>= 3.0.0),
-    arrow (>= 5.0.0),
-    qs (>= 0.24.1),
-    callr (>= 3.7.0),
-    readr (>= 2.0.0),
-    dplyr (>= 1.0.7),
-    gsisdecoder,
-    magrittr (>= 2.0.1),
-    future (>= 1.21.0),
-    furrr (>= 0.2.2),
-    glue (>= 1.4.2),
-    waldo (>= 0.4.0)
-Remotes:
-  nflverse/nflfastR,
-  nflverse/nflreadr,
-  nflverse/nflverse-data
-URL: https://github.com/nflverse/nflfastr.data
-BugReports: https://github.com/nflverse/nflfastr.data/issues
