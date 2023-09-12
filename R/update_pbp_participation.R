@@ -34,6 +34,10 @@ pbp_participation <-
     plays <- plays |>
       dplyr::mutate(
         game_id = as.character(game_id),
+        # SB exception
+        week = dplyr::case_when(!!season <= 2021 & week == 22 ~ 21,
+                                !!season >= 2022 & week == 23 ~ 22,
+                                T ~ week),
         players_on_play2 = players_on_play) |>
       dplyr::select(
         old_game_id = game_id,
