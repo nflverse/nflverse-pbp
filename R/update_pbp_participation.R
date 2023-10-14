@@ -11,9 +11,9 @@ pbp_participation <-
       dplyr::transmute(
         game_id = as.character(game_id),
         # SB exception
-        week = dplyr::case_when(!!season <= 2021 & week == 22 ~ 21,
-                                !!season >= 2022 & week == 23 ~ 22,
-                                T ~ week),
+        week = dplyr::case_when(!!season <  2021 & week == 22 ~ 21,
+                                !!season >= 2021 & week == 23 ~ 22,
+                                TRUE ~ week),
         nflverse_game_id = paste(season,
                                  stringr::str_pad(week,2,side = "left",0),
                                  visitor_team_abbr,
@@ -39,9 +39,9 @@ pbp_participation <-
       dplyr::mutate(
         game_id = as.character(game_id),
         # SB exception
-        week = dplyr::case_when(!!season <= 2021 & week == 22 ~ 21,
-                                !!season >= 2022 & week == 23 ~ 22,
-                                T ~ week),
+        week = dplyr::case_when(!!season <  2021 & week == 22 ~ 21,
+                                !!season >= 2021 & week == 23 ~ 22,
+                                TRUE ~ week),
         players_on_play2 = players_on_play) |>
       dplyr::select(
         old_game_id = game_id,
