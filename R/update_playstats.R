@@ -1,6 +1,15 @@
 save_playstats <- function(season) {
 
-  playstats <- nflfastR:::build_playstats(seasons = season)
+  playstats <- purrr::possibly(
+    nflfastR:::build_playstats,
+    otherwise = data.frame(),
+    quiet = FALSE
+  )(seasons = season)
+
+  if(nrow(playstats) == 0){
+    cli::cli_alert_warning("Download failed. Gonna abort")
+    return(NULL)
+  }
 
   attr(playstats,"nflfastR_version") <- packageVersion("nflfastR")
 
