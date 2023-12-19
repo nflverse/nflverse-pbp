@@ -54,7 +54,7 @@ pbp_participation <-
         offense_personnel,
         defenders_in_box = defense_defenders_in_the_box,
         defense_personnel,
-        number_of_pass_rushers = defense_number_of_pass_rushers
+        number_of_pass_rushers = defense_number_of_pass_rushers,
       ) |>
       tidyr::separate_rows(players_on_play2, sep = ";") |>
       dplyr::left_join(
@@ -79,7 +79,7 @@ pbp_participation <-
         defenders_in_box,
         defense_personnel,
         number_of_pass_rushers,
-        players_on_play
+        players_on_play,
       ) |>
       # oak -> lv exception
       # dplyr::mutate(tmp_possession_team = nflreadr::clean_team_abbrs(possession_team, current_location = TRUE, keep_non_matches = TRUE)) |>
@@ -92,7 +92,15 @@ pbp_participation <-
       ) |>
       dplyr::ungroup() |>
       dplyr::left_join(
-        games |> dplyr::mutate(old_game_id = as.character(game_id)), by = c("old_game_id" = "old_game_id")
+        games |> dplyr::mutate(old_game_id = as.character(game_id)),
+        by = c("old_game_id" = "old_game_id")
+      ) |>
+      dplyr::left_join(
+        plays |> dplyr::mutate(old_game_id = as.character(game_id)) |>
+          dplyr::select(old_game_id, play_id, pass_info, rec_info, dplyr::any_of(
+            c('defense_man_zone_type', 'defense_coverage_type')
+          )) |> tidyr::unnest(pass_info) |> tidyr::unnest(rec_info) |> janitor::clean_names(),
+        by = c("old_game_id" = "old_game_id", "play_id" = "play_id")
       ) |>
       dplyr::select(
         nflverse_game_id,
@@ -108,8 +116,21 @@ pbp_participation <-
         offense_players,
         defense_players,
         n_offense,
-        n_defense
+        n_defense,
+        air_yards,
+        time_to_throw,
+        was_pressure,
+        route,
+        dplyr::any_of(c('defense_man_zone_type','defense_coverage_type'))
       )
+
+    if(!('defense_man_zone_type' %in% colnames(plays))) {
+      plays$defense_man_zone_type <- NA_character_
+    }
+
+    if(!('defense_coverage_type' %in% colnames(plays))) {
+      plays$defense_coverage_type <- NA_character_
+    }
 
     cli::cli_process_start("Uploading participation data to nflverse-data")
 
