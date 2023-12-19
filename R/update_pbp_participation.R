@@ -2,6 +2,29 @@ pbp_participation <-
   function(season) {
     stopifnot(season >= 2016)
 
+    plays_template <- tibble::tibble(
+      nflverse_game_id = character(0),
+      old_game_id = character(0),
+      play_id = integer(0),
+      possession_team = character(0),
+      offense_formation = character(0),
+      offense_personnel = character(0),
+      defenders_in_box = integer(0),
+      defense_personnel = character(0),
+      number_of_pass_rushers = integer(0),
+      players_on_play = character(0),
+      offense_players = character(0),
+      defense_players = character(0),
+      n_offense = integer(0),
+      n_defense = integer(0),
+      air_yards = double(0),
+      time_to_throw = double(0),
+      was_pressure = logical(0),
+      route = character(0),
+      defense_man_zone_type = character(0),
+      defense_coverage_type = character(0)
+    )
+
     cli::cli_alert_info("Obtaining schedules...")
     games <- dplyr::bind_rows(
       ngsscrapR::scrape_schedule(season, seasonType = "REG"),
@@ -54,7 +77,7 @@ pbp_participation <-
         offense_personnel,
         defenders_in_box = defense_defenders_in_the_box,
         defense_personnel,
-        number_of_pass_rushers = defense_number_of_pass_rushers,
+        number_of_pass_rushers = defense_number_of_pass_rushers
       ) |>
       tidyr::separate_rows(players_on_play2, sep = ";") |>
       dplyr::left_join(
@@ -79,7 +102,7 @@ pbp_participation <-
         defenders_in_box,
         defense_personnel,
         number_of_pass_rushers,
-        players_on_play,
+        players_on_play
       ) |>
       # oak -> lv exception
       # dplyr::mutate(tmp_possession_team = nflreadr::clean_team_abbrs(possession_team, current_location = TRUE, keep_non_matches = TRUE)) |>
@@ -124,13 +147,7 @@ pbp_participation <-
         dplyr::any_of(c('defense_man_zone_type','defense_coverage_type'))
       )
 
-    if(!('defense_man_zone_type' %in% colnames(plays))) {
-      plays$defense_man_zone_type <- NA_character_
-    }
-
-    if(!('defense_coverage_type' %in% colnames(plays))) {
-      plays$defense_coverage_type <- NA_character_
-    }
+    plays <- dplyr::bind_rows(plays_template, plays)
 
     cli::cli_process_start("Uploading participation data to nflverse-data")
 
