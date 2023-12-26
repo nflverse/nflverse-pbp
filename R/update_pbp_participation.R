@@ -147,7 +147,11 @@ pbp_participation <-
         dplyr::any_of(c('defense_man_zone_type','defense_coverage_type'))
       )
 
-    plays <- dplyr::bind_rows(plays_template, plays)
+    current_participation <- nflreadr::load_participation(season) |>
+      dplyr::anti_join(plays, by = c("nflverse_game_id"))
+
+    plays <- dplyr::bind_rows(plays_template, current_participation, plays) |>
+      dplyr::arrange(nflverse_game_id)
 
     cli::cli_process_start("Uploading participation data to nflverse-data")
 
