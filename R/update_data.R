@@ -1,4 +1,4 @@
-season <- Sys.getenv("NFLVERSE_UPDATE_SEASON", unset = NA_character_)
+season <- Sys.getenv("NFLVERSE_UPDATE_SEASON", unset = NA_character_) |> as.integer()
 type <- Sys.getenv("NFLVERSE_UPDATE_TYPE", unset = NA_character_)
 
 if (any(is.na(season), is.na(type))) {
