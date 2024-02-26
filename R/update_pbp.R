@@ -32,11 +32,3 @@ save_pbp <- function(season) {
     ))
   }
 }
-
-future::plan(future::multisession)
-if(Sys.getenv("NFLVERSE_REBUILD","false")=="true"){
-  purrr::map(1999:nflreadr:::most_recent_season(), save_pbp)
-} else {
-  save_pbp(nflreadr:::most_recent_season())
-}
-future::plan(future::sequential)
