@@ -32,10 +32,10 @@ jobs:
     steps:
       - name: query_seasons
         if: ${{ inputs.full_rebuild == false}}
-        run: echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match('\\d+').string] | max')" > $GITHUB_OUTPUT
+        run: echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match("\\d+").string] | max')" > $GITHUB_OUTPUT
       - id: query_seasons
         if: ${{ inputs.full_rebuild == true}}
-        run: echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match('\\d+').string]')" > $GITHUB_OUTPUT
+        run: echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match("\\d+").string]')" > $GITHUB_OUTPUT
 
   update_pbp:
     needs: pbp_setup
