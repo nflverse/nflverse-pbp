@@ -45,7 +45,7 @@ jobs:
       fail-fast: false
       matrix:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
-        type: pbp
+        type: "pbp"
     env:
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
