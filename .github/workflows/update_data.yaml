@@ -1,4 +1,27 @@
 on:
   workflow_dispatch:
+    inputs:
+      full_rebuild:
+        description: 'Full Rebuild'
+        required: true
+        default: false
+        type: boolean
 
-name: Update Data
+name: Update_PBP_Data
+
+jobs:
+  pbp_setup:
+    runs-on: ubuntu-latest
+    name: pbp_setup
+    env:
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+    outputs:
+      seasons: ${{ steps.query_seasons.outputs.seasons }}
+    steps:
+      - name: query_seasons
+        if: ${{ inputs.full_rebuild == false}}
+        run: |
+          echo gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match(\"\\d+\").string] | max'
+      - id: query_seasons
+        if: ${{ inputs.full_rebuild == true}}
+        run: echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match(\"\\d+\").string]')" > $GITHUB_OUTPUT
