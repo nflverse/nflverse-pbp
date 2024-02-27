@@ -41,7 +41,7 @@ jobs:
 
   update_pbp:
     needs: pbp_setup
-    name: Update ${{ matrix.season }} PBP Data & Stats & Laterals
+    name: Update ${{ matrix.season }} ${{ matrix.type }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -71,7 +71,7 @@ jobs:
 
   update_stats:
     needs: [pbp_setup, update_pbp]
-    name: Update ${{ matrix.season }} Player Stats & Participation
+    name: Update ${{ matrix.season }} ${{ matrix.type }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -101,7 +101,7 @@ jobs:
 
   combine_stats:
     needs: [pbp_setup, update_stats]
-    name: Combine Player Stats
+    name: Combine ${{ matrix.type }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
