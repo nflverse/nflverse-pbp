@@ -41,7 +41,7 @@ jobs:
 
   update_pbp:
     needs: pbp_setup
-    name: Update ${{ matrix.season }} PBP Data
+    name: Update ${{ matrix.season }} PBP Data & Stats & Laterals
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -70,7 +70,7 @@ jobs:
         run: Rscript -e 'source("R/update_data.R")'
 
   update_stats:
-    needs: update_pbp
+    needs: [pbp_setup, update_pbp]
     name: Update ${{ matrix.season }} Player Stats & Participation
     runs-on: ubuntu-latest
     strategy:
@@ -100,7 +100,7 @@ jobs:
         run: Rscript -e 'source("R/update_data.R")'
 
   combine_stats:
-    needs: update_stats
+    needs: [pbp_setup, update_stats]
     name: Combine Player Stats
     runs-on: ubuntu-latest
     strategy:
