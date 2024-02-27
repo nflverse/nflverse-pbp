@@ -1,6 +1,8 @@
-pbp_participation <-
-  function(season) {
-    stopifnot(season >= 2016)
+release_pbp_participation <- function(season) {
+    if (season < 2016){
+      cli::cli_alert_warning("No participation data for {.val {season}} season. Abort.")
+      return(NULL)
+    }
 
     plays_template <- tibble::tibble(
       nflverse_game_id = character(0),
@@ -165,10 +167,10 @@ pbp_participation <-
     cli::cli_process_done()
   }
 
-if (Sys.getenv("NFLVERSE_REBUILD", "false") == "true") {
-  future::plan(future::multisession)
-  purrr::walk(c(2016:nflreadr:::most_recent_season()),
-              pbp_participation)
-} else {
-  pbp_participation(nflreadr:::most_recent_season())
-}
+# if (Sys.getenv("NFLVERSE_REBUILD", "false") == "true") {
+#   future::plan(future::multisession)
+#   purrr::walk(c(2016:nflreadr:::most_recent_season()),
+#               pbp_participation)
+# } else {
+#   pbp_participation(nflreadr:::most_recent_season())
+# }

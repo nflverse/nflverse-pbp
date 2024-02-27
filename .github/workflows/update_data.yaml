@@ -19,7 +19,7 @@ on:
         default: false
         type: boolean
 
-name: Update_PBP_Data
+name: Update PBP Related Data
 
 jobs:
   pbp_setup:
@@ -47,7 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
-        type: ["pbp"]
+        type: ["pbp", "pbp_stats", "laterals"]
     env:
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
@@ -66,5 +66,63 @@ jobs:
             nflverse/fastrmodels
             ropensci/piggyback
 
-      - name: Release pbp
+      - name: Release ${{ matrix.type }}
+        run: Rscript -e 'source("R/update_data.R")'
+
+  update_stats:
+    needs: update_pbp
+    name: Update ${{ matrix.season }} Player Stats & Participation
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
+        type: ["ps_off", "ps_def", "ps_kick", "participation"]
+    env:
+      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
+      NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+           cache-version: 1
+           extra-packages: |
+            nflverse/nflfastR
+            nflverse/nflreadr
+            nflverse/nflverse-data
+            nflverse/fastrmodels
+            ropensci/piggyback
+
+      - name: Release ${{ matrix.type }}
+        run: Rscript -e 'source("R/update_data.R")'
+
+  combine_stats:
+    needs: update_stats
+    name: Combine Player Stats
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        type: ["ps_off_comb", "ps_def_comb", "ps_kick_comb"]
+    env:
+      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+           cache-version: 1
+           extra-packages: |
+            nflverse/nflfastR
+            nflverse/nflreadr
+            nflverse/nflverse-data
+            nflverse/fastrmodels
+            ropensci/piggyback
+
+      - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
