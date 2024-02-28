@@ -2,6 +2,9 @@ release_pbp_participation <- function(season) {
     if (season < 2016){
       cli::cli_alert_warning("No participation data for {.val {season}} season. Abort.")
       return(NULL)
+    } else if (season <= 2023){
+      cli::cli_alert_warning("It seems like the {.val {season}} season is gone from the api. Skip to avoid loss of data.")
+      return(NULL)
     }
 
     plays_template <- tibble::tibble(
