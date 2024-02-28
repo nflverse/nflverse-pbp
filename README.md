@@ -1,5 +1,7 @@
 # nflverse pbp data
 
+[![Update PBP Related Data](https://github.com/nflverse/nflverse-pbp/actions/workflows/update_data.yaml/badge.svg)](https://github.com/nflverse/nflverse-pbp/actions/workflows/update_data.yaml)
+
 This repository stores code and workflows for updating nflverse play by play, player stats, and kicking stat summaries. The data itself is now being automatically pushed to GitHub releases at https://github.com/nflverse/nflverse-data/releases, which reduces repository bloat. 
 
 
