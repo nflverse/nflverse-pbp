@@ -1,8 +1,12 @@
-save_pbp <- function(season) {
-  ids <- nflreadr::load_schedules(season) |>
-    dplyr::filter(!is.na(result)) |>
-    dplyr::pull(game_id)
+release_pbp <- function(season) {
 
+  pbp_dir <- file.path(tempdir(check = TRUE), "pbp")
+  if (!dir.exists(pbp_dir)) dir.create(pbp_dir)
+
+  options("nflfastR.raw_directory" = pbp_dir)
+
+  ids <- nflfastR::missing_raw_pbp(seasons = season)
+  load <- nflfastR::save_raw_pbp(ids)
   pbp <- nflfastR::build_nflfastR_pbp(ids)
 
   n_pbp_ids <- length(unique(pbp$game_id))
@@ -32,11 +36,3 @@ save_pbp <- function(season) {
     ))
   }
 }
-
-future::plan(future::multisession)
-if(Sys.getenv("NFLVERSE_REBUILD","false")=="true"){
-  purrr::map(1999:nflreadr:::most_recent_season(), save_pbp)
-} else {
-  save_pbp(nflreadr:::most_recent_season())
-}
-future::plan(future::sequential)

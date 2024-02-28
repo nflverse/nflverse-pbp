@@ -1,13 +1,30 @@
 on:
+  schedule:
+    # Every day at 9:00 UTC/5:00 ET
+    - cron:  '0 9 * 1,2,9-12 *'
+    # TNF 5:30 AM UTC / 12:30 AM ET
+    - cron:  '30 5 * 1,2,9-12 5'
+    # Early window: 10:00 PM UTC / 5:00 PM ET
+    - cron:  '00 22 * 1,2,9-12 0'
+    # Late window: 0:00 UTC / 8:00 ET
+    - cron:  '5 0 * 1,2,9-12 1'
+    # SNF/MNF: 5:30 UTC / 12:30 ET
+    - cron:  '30 5 * 1,2,9-12 1'
+    - cron:  '30 5 * 1,2,9-12 2'
   workflow_dispatch:
     inputs:
+      season_rebuild:
+        description: 'Rebuild Season (9999 defaults to latest season)'
+        required: false
+        default: 9999
+        type: number
       full_rebuild:
         description: 'Full Rebuild'
         required: true
         default: false
         type: boolean
 
-name: Update_PBP_Data
+name: Update PBP Related Data
 
 jobs:
   pbp_setup:
@@ -18,10 +35,96 @@ jobs:
     outputs:
       seasons: ${{ steps.query_seasons.outputs.seasons }}
     steps:
-      - name: query_seasons
-        if: ${{ inputs.full_rebuild == false}}
-        run: |
-          echo gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match(\"\\d+\").string] | max'
       - id: query_seasons
-        if: ${{ inputs.full_rebuild == true}}
-        run: echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match(\"\\d+\").string]')" > $GITHUB_OUTPUT
+        run: |
+          if [ ${{ inputs.full_rebuild }} == true ]
+          then
+            echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | match("\\d+") | .string ]')" > "$GITHUB_OUTPUT"
+          elif [ ${{ inputs.season_rebuild }} == 9999 ]
+          then
+            echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[[.[].tagName | match("\\d+") | .string ] | max]')" > "$GITHUB_OUTPUT"
+          else
+            echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | select(endswith(${{ inputs.season_rebuild }} | tostring)) | match("\\d+") | .string]')" > "$GITHUB_OUTPUT"
+          fi
+
+  update_pbp:
+    needs: pbp_setup
+    name: Update ${{ matrix.season }} ${{ matrix.type }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
+        type: ["pbp", "pbp_stats", "laterals"]
+    env:
+      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
+      NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1
+          extra-packages: |
+            nflverse/nflfastR
+            nflverse/nflreadr
+            nflverse/nflverse-data
+            nflverse/fastrmodels
+            ropensci/piggyback
+      - name: Release ${{ matrix.type }}
+        run: Rscript -e 'source("R/update_data.R")'
+
+  update_stats:
+    needs: [pbp_setup, update_pbp]
+    name: Update ${{ matrix.season }} ${{ matrix.type }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
+        type: ["ps_off", "ps_def", "ps_kick", "participation"]
+    env:
+      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
+      NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1
+          extra-packages: |
+            nflverse/nflfastR
+            nflverse/nflreadr
+            nflverse/nflverse-data
+            nflverse/fastrmodels
+            ropensci/piggyback
+      - name: Release ${{ matrix.type }}
+        run: Rscript -e 'source("R/update_data.R")'
+
+  combine_stats:
+    needs: [pbp_setup, update_stats]
+    name: Build ${{ matrix.type }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        type: ["ps_off_comb", "ps_def_comb", "ps_kick_comb"]
+    env:
+      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1
+          extra-packages: |
+            nflverse/nflfastR
+            nflverse/nflreadr
+            nflverse/nflverse-data
+            nflverse/fastrmodels
+            ropensci/piggyback
+      - name: Release ${{ matrix.type }}
+        run: Rscript -e 'source("R/update_data.R")'
