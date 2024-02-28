@@ -166,11 +166,3 @@ release_pbp_participation <- function(season) {
 
     cli::cli_process_done()
   }
-
-# if (Sys.getenv("NFLVERSE_REBUILD", "false") == "true") {
-#   future::plan(future::multisession)
-#   purrr::walk(c(2016:nflreadr:::most_recent_season()),
-#               pbp_participation)
-# } else {
-#   pbp_participation(nflreadr:::most_recent_season())
-# }
