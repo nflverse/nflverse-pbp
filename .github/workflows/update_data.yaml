@@ -53,7 +53,7 @@ jobs:
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
     steps:
-      - uses: ./.github/workflows/setup-nflverse-update.yaml
+      - uses: ./.github/workflows/setup-nflverse-update.yaml@workflow-rewrite
 
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
@@ -72,7 +72,7 @@ jobs:
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
     steps:
-      - uses: ./.github/workflows/setup-nflverse-update.yaml
+      - uses: ./.github/workflows/setup-nflverse-update.yaml@workflow-rewrite
 
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
@@ -89,7 +89,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
     steps:
-      - uses: ./.github/workflows/setup-nflverse-update.yaml
+      - uses: ./.github/workflows/setup-nflverse-update.yaml@workflow-rewrite
 
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
