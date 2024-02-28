@@ -14,8 +14,8 @@ on:
   workflow_dispatch:
     inputs:
       season_rebuild:
-        description: 'Rebuild Season'
-        required: true
+        description: 'Rebuild Season (9999 defaults to latest season)'
+        required: false
         default: 9999
         type: number
       full_rebuild:
@@ -44,7 +44,7 @@ jobs:
           then
             echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[[.[].tagName | match("\\d+") | .string ] | max]')" > "$GITHUB_OUTPUT"
           else
-            gh release list -R nflverse/nflverse-pbp --json tagName --jq '[[.[].tagName | match("\\d+") | .string | match(${{ inputs.season_rebuild }}) | .string]]'
+            gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | select(endswith(${{ inputs.season_rebuild }} | tostring)) | match("\\d+") | .string]'
           fi
 
   update_pbp:
