@@ -1,18 +1,15 @@
 name: Setup nflverse Update
 
-on:
-  workflow_call:
-
-jobs:
-  call-another-reusable:
-    uses: actions/checkout@v4
-    uses: r-lib/actions/setup-r@v2
-    uses: r-lib/actions/setup-r-dependencies@v2
-    with:
-      cache-version: 1
-      extra-packages: |
-        nflverse/nflfastR
-        nflverse/nflreadr
-        nflverse/nflverse-data
-        nflverse/fastrmodels
-        ropensci/piggyback
+runs:
+  steps:
+    - uses: actions/checkout@v4
+    - uses: r-lib/actions/setup-r@v2
+    - uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        cache-version: 1
+        extra-packages: |
+          nflverse/nflfastR
+          nflverse/nflreadr
+          nflverse/nflverse-data
+          nflverse/fastrmodels
+          ropensci/piggyback
