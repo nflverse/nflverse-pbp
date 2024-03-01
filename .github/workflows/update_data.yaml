@@ -46,7 +46,7 @@ jobs:
           then
             echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[[.[].tagName | match("\\d+") | .string ] | max]')" > "$GITHUB_OUTPUT"
           else
-            echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | select(endswith($SEASON_REBUILD | tostring)) | match("\\d+") | .string]')" > "$GITHUB_OUTPUT"
+            echo "seasons=$(gh release list -R nflverse/nflverse-pbp --json tagName --jq '[.[].tagName | select(endswith(${{SEASON_REBUILD}} | tostring)) | match("\\d+") | .string]')" > "$GITHUB_OUTPUT"
           fi
 
   update_pbp:
