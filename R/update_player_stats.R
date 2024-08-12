@@ -19,21 +19,27 @@ release_playerstats_offense <- function(season){
     dplyr::filter(season_type == "REG") |>
     nflfastR::calculate_player_stats(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "REG"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_post_season <- pbp |>
     dplyr::filter(season_type == "POST") |>
     nflfastR::calculate_player_stats(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "POST"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_all_season <- pbp |>
     nflfastR::calculate_player_stats(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "REG+POST"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_season <- dplyr::bind_rows(ps_reg_season, ps_post_season, ps_all_season)
 
@@ -132,21 +138,27 @@ release_playerstats_defense <- function(season) {
     dplyr::filter(season_type == "REG") |>
     nflfastR::calculate_player_stats_def(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "REG"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_post_season <- pbp |>
     dplyr::filter(season_type == "POST") |>
     nflfastR::calculate_player_stats_def(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "POST"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_all_season <- pbp |>
     nflfastR::calculate_player_stats_def(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "REG+POST"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_season <- dplyr::bind_rows(ps_reg_season, ps_post_season, ps_all_season)
 
@@ -245,21 +257,27 @@ release_playerstats_kicking <- function(season) {
     dplyr::filter(season_type == "REG") |>
     nflfastR::calculate_player_stats_kicking(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "REG"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_post_season <- pbp |>
     dplyr::filter(season_type == "POST") |>
     nflfastR::calculate_player_stats_kicking(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "POST"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_all_season <- pbp |>
     nflfastR::calculate_player_stats_kicking(weekly = FALSE) |>
     dplyr::mutate(
+      season = season,
       season_type = "REG+POST"
-    )
+    ) |>
+    dplyr::select(season, season_type, dplyr::everything())
 
   ps_season <- dplyr::bind_rows(ps_reg_season, ps_post_season, ps_all_season)
 
