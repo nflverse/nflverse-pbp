@@ -74,7 +74,7 @@ release_playerstats_offense_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_week, "nflfastR_version") <- packageVersion("nflfastR")
 
 
   # COMBINE SEASON LEVEL STATS #################################################
@@ -91,7 +91,7 @@ release_playerstats_offense_combined <- function(...){
   # RELEASE ####################################################################
 
   nflversedata::nflverse_save(
-    data_frame = stats_df,
+    data_frame = stats_df_week,
     file_name =  "player_stats",
     nflverse_type = "player stats: offense",
     release_tag = "player_stats",
@@ -187,7 +187,7 @@ release_playerstats_defense_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_week, "nflfastR_version") <- packageVersion("nflfastR")
 
 
   # COMBINE SEASON LEVEL STATS #################################################
@@ -204,7 +204,7 @@ release_playerstats_defense_combined <- function(...){
   # RELEASE ####################################################################
 
   nflversedata::nflverse_save(
-    data_frame = stats_df,
+    data_frame = stats_df_week,
     file_name = "player_stats_def",
     nflverse_type = "player stats: defense",
     release_tag = "player_stats",
@@ -300,7 +300,7 @@ release_playerstats_kicking_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_week, "nflfastR_version") <- packageVersion("nflfastR")
 
 
   # COMBINE SEASON LEVEL STATS #################################################
@@ -317,7 +317,7 @@ release_playerstats_kicking_combined <- function(...){
   # RELEASE ####################################################################
 
   nflversedata::nflverse_save(
-    data_frame = stats_df,
+    data_frame = stats_df_week,
     file_name =  "player_stats_kicking",
     nflverse_type = "player stats: kicking",
     release_tag = "player_stats",
