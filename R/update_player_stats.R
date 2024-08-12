@@ -43,7 +43,7 @@ release_playerstats_offense <- function(season){
   # RELEASE ####################################################################
 
   nflversedata::nflverse_save(
-    data_frame = ps,
+    data_frame = ps_weekly,
     file_name =  glue::glue("player_stats_{season}"),
     nflverse_type = "player stats: offense",
     release_tag = "player_stats",
@@ -156,7 +156,7 @@ release_playerstats_defense <- function(season) {
   # RELEASE ####################################################################
 
   nflversedata::nflverse_save(
-    data_frame = ps,
+    data_frame = ps_weekly,
     file_name = glue::glue("player_stats_def_{season}"),
     nflverse_type = "player stats: defense",
     release_tag = "player_stats",
@@ -269,7 +269,7 @@ release_playerstats_kicking <- function(season) {
   # RELEASE ####################################################################
 
   nflversedata::nflverse_save(
-    ps,
+    ps_weekly,
     file_name = glue::glue("player_stats_kicking_{season}"),
     nflverse_type = "player stats: kicking",
     release_tag = "player_stats",
@@ -277,7 +277,7 @@ release_playerstats_kicking <- function(season) {
   )
 
   nflversedata::nflverse_save(
-    ps,
+    ps_season,
     file_name = glue::glue("player_stats_kicking_season_{season}"),
     nflverse_type = "player stats: kicking (season)",
     release_tag = "player_stats",
