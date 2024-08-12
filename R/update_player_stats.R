@@ -10,7 +10,7 @@ release_playerstats_offense <- function(season){
 
   ps_weekly <- pbp |>
     nflfastR::calculate_player_stats(weekly = TRUE)
-  attr(ps, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_weekly, "nflfastR_version") <- packageVersion("nflfastR")
 
 
   # SEASON LEVEL SUMMARY #######################################################
@@ -123,7 +123,7 @@ release_playerstats_defense <- function(season) {
 
   ps_weekly <- pbp |>
     nflfastR::calculate_player_stats_def(weekly = TRUE)
-  attr(ps, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_weekly, "nflfastR_version") <- packageVersion("nflfastR")
 
 
   # SEASON LEVEL SUMMARY #######################################################
@@ -236,7 +236,7 @@ release_playerstats_kicking <- function(season) {
 
   ps_weekly <- pbp |>
     nflfastR::calculate_player_stats_kicking(weekly = TRUE)
-  attr(ps, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_weekly, "nflfastR_version") <- packageVersion("nflfastR")
 
 
   # SEASON LEVEL SUMMARY #######################################################
