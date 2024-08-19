@@ -15,7 +15,7 @@ release_pbp_stats <- function(season) {
     return(NULL)
   }
 
-  attr(playstats,"nflfastR_version") <- packageVersion("nflfastR")
+  attr(playstats,"nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   nflversedata::nflverse_save(
     data_frame = playstats,

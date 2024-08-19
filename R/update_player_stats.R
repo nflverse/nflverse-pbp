@@ -10,7 +10,7 @@ release_playerstats_offense <- function(season){
 
   ps_weekly <- pbp |>
     nflfastR::calculate_player_stats(weekly = TRUE)
-  attr(ps_weekly, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_weekly, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # SEASON LEVEL SUMMARY #######################################################
@@ -43,7 +43,7 @@ release_playerstats_offense <- function(season){
 
   ps_season <- dplyr::bind_rows(ps_reg_season, ps_post_season, ps_all_season)
 
-  attr(ps_season, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_season, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # RELEASE ####################################################################
@@ -80,7 +80,7 @@ release_playerstats_offense_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df_week, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_week, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # COMBINE SEASON LEVEL STATS #################################################
@@ -92,7 +92,7 @@ release_playerstats_offense_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df_season, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_season, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   # RELEASE ####################################################################
 
@@ -129,7 +129,7 @@ release_playerstats_defense <- function(season) {
 
   ps_weekly <- pbp |>
     nflfastR::calculate_player_stats_def(weekly = TRUE)
-  attr(ps_weekly, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_weekly, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # SEASON LEVEL SUMMARY #######################################################
@@ -162,7 +162,7 @@ release_playerstats_defense <- function(season) {
 
   ps_season <- dplyr::bind_rows(ps_reg_season, ps_post_season, ps_all_season)
 
-  attr(ps_season, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_season, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # RELEASE ####################################################################
@@ -199,7 +199,7 @@ release_playerstats_defense_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df_week, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_week, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # COMBINE SEASON LEVEL STATS #################################################
@@ -211,7 +211,7 @@ release_playerstats_defense_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df_season, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_season, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   # RELEASE ####################################################################
 
@@ -248,7 +248,7 @@ release_playerstats_kicking <- function(season) {
 
   ps_weekly <- pbp |>
     nflfastR::calculate_player_stats_kicking(weekly = TRUE)
-  attr(ps_weekly, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_weekly, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # SEASON LEVEL SUMMARY #######################################################
@@ -281,7 +281,7 @@ release_playerstats_kicking <- function(season) {
 
   ps_season <- dplyr::bind_rows(ps_reg_season, ps_post_season, ps_all_season)
 
-  attr(ps_season, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(ps_season, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # RELEASE ####################################################################
@@ -318,7 +318,7 @@ release_playerstats_kicking_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df_week, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_week, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
 
   # COMBINE SEASON LEVEL STATS #################################################
@@ -330,7 +330,7 @@ release_playerstats_kicking_combined <- function(...){
     ) |>
     purrr::list_rbind()
 
-  attr(stats_df_season, "nflfastR_version") <- packageVersion("nflfastR")
+  attr(stats_df_season, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   # RELEASE ####################################################################
 
