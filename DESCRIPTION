@@ -33,6 +33,7 @@ Imports:
     magrittr (>= 2.0.1),
     future (>= 1.21.0),
     furrr (>= 0.2.2),
+    future.mirai (>= 1.2.0), 
     glue (>= 1.4.2),
     waldo (>= 0.4.0)
 Remotes:
