@@ -59,7 +59,7 @@ jobs:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
         type: ["pbp", "pbp_stats"]
     env:
-      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
     steps:
@@ -73,7 +73,7 @@ jobs:
           cache-version: 1
           extra-packages: |
             nflverse/nflverse-data
-            ropensci/piggyback
+            nflverse/fastrmodels
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
 
@@ -87,7 +87,7 @@ jobs:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
         type: ["ps_off", "ps_def", "ps_kick", "participation"]
     env:
-      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
     steps:
@@ -101,7 +101,7 @@ jobs:
           cache-version: 1
           extra-packages: |
             nflverse/nflverse-data
-            ropensci/piggyback
+            nflverse/fastrmodels
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
 
@@ -114,7 +114,7 @@ jobs:
       matrix:
         type: ["ps_off_comb", "ps_def_comb", "ps_kick_comb", "laterals"]
     env:
-      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
     steps:
       - uses: actions/checkout@v4
@@ -127,6 +127,6 @@ jobs:
           cache-version: 1
           extra-packages: |
             nflverse/nflverse-data
-            ropensci/piggyback
+            nflverse/fastrmodels
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
