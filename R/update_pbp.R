@@ -18,7 +18,7 @@ release_pbp <- function(season) {
     (season >= 2001 & n_pbp_ids == n_ids)
   ){
 
-    attr(pbp,"nflfastR_version") <- packageVersion("nflfastR")
+    attr(pbp, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
     nflversedata::nflverse_save(
       data_frame = pbp,
