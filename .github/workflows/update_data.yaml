@@ -102,6 +102,7 @@ jobs:
           extra-packages: |
             nflverse/nflverse-data
             nflverse/fastrmodels
+            nflverse/ngsscrapR
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
 
