@@ -88,6 +88,7 @@ jobs:
         type: ["ps_off", "ps_def", "ps_kick", "participation"]
     env:
       GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
     steps:
