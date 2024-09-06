@@ -60,8 +60,13 @@ release_pbp_participation <- function(season) {
     }
 
     progressr::with_progress({
-      plays <- obtain_plays()
+      plays <- purrr::possibly(obtain_plays)()
     })
+
+    if (nrow(plays) == 0){
+      cli::cli_alert_warning("Can't access data. Quitting here.")
+      return(invisible(FALSE))
+    }
 
     plays <- plays |>
       dplyr::mutate(
