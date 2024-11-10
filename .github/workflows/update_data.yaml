@@ -94,7 +94,7 @@ jobs:
       fail-fast: false
       matrix:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
-        type: ["ps_off", "ps_def", "ps_kick", "participation"]
+        type: ["ps_off", "ps_def", "ps_kick"]
     env:
       GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
