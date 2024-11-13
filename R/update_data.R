@@ -2,7 +2,7 @@ season <- Sys.getenv("NFLVERSE_UPDATE_SEASON", unset = NA_character_) |> as.inte
 type <- Sys.getenv("NFLVERSE_UPDATE_TYPE", unset = NA_character_)
 type <- rlang::arg_match0(
   type,
-  c("pbp", "pbp_stats", "ps_off", "ps_def", "ps_kick", "laterals",
+  c("pbp", "pbp_stats", "ps_off", "ps_def", "ps_kick", "stats", "laterals",
     "participation", "ps_off_comb", "ps_def_comb", "ps_kick_comb")
 )
 
@@ -12,6 +12,7 @@ options(nflreadr.verbose = FALSE)
 source("R/update_pbp.R")
 source("R/update_playstats.R")
 source("R/update_player_stats.R")
+source("R/update_stats.R")
 source("R/update_multiple_laterals.R")
 source("R/update_pbp_participation.R")
 
@@ -26,6 +27,7 @@ release <- switch (
   "ps_kick" = release_playerstats_kicking,
   "ps_kick_comb" = release_playerstats_kicking_combined,
   "laterals" = release_lateral_yards,
-  "participation" = release_pbp_participation
+  "participation" = release_pbp_participation,
+  "stats" = release_stats
 )
 release(season)

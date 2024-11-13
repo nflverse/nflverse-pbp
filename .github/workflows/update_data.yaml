@@ -94,7 +94,7 @@ jobs:
       fail-fast: false
       matrix:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
-        type: ["ps_off", "ps_def", "ps_kick"]
+        type: ["ps_off", "ps_def", "ps_kick", "stats"]
     env:
       GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
@@ -112,7 +112,6 @@ jobs:
           extra-packages: |
             nflverse/nflverse-data
             nflverse/fastrmodels
-            nflverse/ngsscrapR
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
 
