@@ -1,17 +1,18 @@
 release_stats <- function(season){
+  library(rlang)
   cli::cli_progress_step("Starting {.fct nflfastR::calculate_stats} for {season}!")
 
   # WEEK LEVEL SUMMARY #########################################################
 
   stats_week_player <- nflfastR::calculate_stats(
-    season = season,
+    season = .env$season,
     summary_level = "week",
     stat_type = "player"
   )
   attr(stats_week_player, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   stats_week_team <- nflfastR::calculate_stats(
-    season = season,
+    season = .env$season,
     summary_level = "week",
     stat_type = "team"
   )
@@ -36,7 +37,7 @@ release_stats <- function(season){
   # PLAYER SEASON LEVEL SUMMARY ################################################
 
   stats_reg_player <- nflfastR::calculate_stats(
-    season = season,
+    season = .env$season,
     summary_level = "season",
     stat_type = "player",
     season_type = "REG"
@@ -44,7 +45,7 @@ release_stats <- function(season){
   attr(stats_reg_player, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   stats_post_player <- nflfastR::calculate_stats(
-    season = season,
+    season = .env$season,
     summary_level = "season",
     stat_type = "player",
     season_type = "POST"
@@ -52,7 +53,7 @@ release_stats <- function(season){
   attr(stats_post_player, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   stats_regpost_player <- nflfastR::calculate_stats(
-    season = season,
+    season = .env$season,
     summary_level = "season",
     stat_type = "player",
     season_type = "REG+POST"
@@ -86,7 +87,7 @@ release_stats <- function(season){
   # TEAM SEASON LEVEL SUMMARY ##################################################
 
   stats_reg_team <- nflfastR::calculate_stats(
-    season = season,
+    season = .env$season,
     summary_level = "season",
     stat_type = "team",
     season_type = "REG"
@@ -94,7 +95,7 @@ release_stats <- function(season){
   attr(stats_reg_team, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   stats_post_team <- nflfastR::calculate_stats(
-    season = season,
+    season = .env$season,
     summary_level = "season",
     stat_type = "team",
     season_type = "POST"
@@ -102,7 +103,7 @@ release_stats <- function(season){
   attr(stats_post_team, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
 
   stats_regpost_team <- nflfastR::calculate_stats(
-    season = season,
+    season = .env$season,
     summary_level = "season",
     stat_type = "team",
     season_type = "REG+POST"
