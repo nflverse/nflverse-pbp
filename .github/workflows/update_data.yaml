@@ -94,7 +94,7 @@ jobs:
       fail-fast: false
       matrix:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
-        type: ["ps_off", "ps_def", "ps_kick", "stats"]
+        type: ["stats"]
     env:
       GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
@@ -122,7 +122,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        type: ["ps_off_comb", "ps_def_comb", "ps_kick_comb", "laterals"]
+        type: ["laterals"]
     env:
       GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
