@@ -7,7 +7,7 @@ type <- rlang::arg_match0(
 )
 
 # Run parallel
-future::plan(future.mirai::mirai_multisession)
+future::plan("multisession")
 options(nflreadr.verbose = FALSE)
 source("R/update_pbp.R")
 source("R/update_playstats.R")
