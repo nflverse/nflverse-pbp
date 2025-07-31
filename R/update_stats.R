@@ -22,7 +22,7 @@ release_stats <- function(season){
       data_frame = stats_week_player,
       file_name =  glue::glue("stats_player_week_{season}"),
       nflverse_type = "player stats: week level",
-      release_tag = "player_stats",
+      release_tag = "stats_player",
       file_types = c("rds", "csv", "parquet", "qs", "csv.gz")
     )
   }
@@ -32,7 +32,7 @@ release_stats <- function(season){
       data_frame = stats_week_team,
       file_name =  glue::glue("stats_team_week_{season}"),
       nflverse_type = "team stats: week level",
-      release_tag = "player_stats",
+      release_tag = "stats_team",
       file_types = c("rds", "csv", "parquet", "qs", "csv.gz")
     )
   }
@@ -67,8 +67,8 @@ release_stats <- function(season){
     nflversedata::nflverse_save(
       data_frame = stats_reg_player,
       file_name =  glue::glue("stats_player_reg_{season}"),
-      nflverse_type = "player stats: season level",
-      release_tag = "player_stats",
+      nflverse_type = "player stats: REG season",
+      release_tag = "stats_player",
       file_types = c("rds", "csv", "parquet", "qs", "csv.gz")
     )
   }
@@ -77,8 +77,8 @@ release_stats <- function(season){
     nflversedata::nflverse_save(
       data_frame = stats_post_player,
       file_name =  glue::glue("stats_player_post_{season}"),
-      nflverse_type = "team stats: season level",
-      release_tag = "player_stats",
+      nflverse_type = "player stats: POST season",
+      release_tag = "stats_player",
       file_types = c("rds", "csv", "parquet", "qs", "csv.gz")
     )
   }
@@ -87,8 +87,8 @@ release_stats <- function(season){
     nflversedata::nflverse_save(
       data_frame = stats_regpost_player,
       file_name =  glue::glue("stats_player_regpost_{season}"),
-      nflverse_type = "team stats: season level",
-      release_tag = "player_stats",
+      nflverse_type = "player stats: REG+POST season",
+      release_tag = "stats_player",
       file_types = c("rds", "csv", "parquet", "qs", "csv.gz")
     )
   }
@@ -123,8 +123,8 @@ release_stats <- function(season){
     nflversedata::nflverse_save(
       data_frame = stats_reg_team,
       file_name =  glue::glue("stats_team_reg_{season}"),
-      nflverse_type = "player stats: season level",
-      release_tag = "player_stats",
+      nflverse_type = "team stats: REG season",
+      release_tag = "stats_team",
       file_types = c("rds", "csv", "parquet", "qs", "csv.gz")
     )
   }
@@ -133,8 +133,8 @@ release_stats <- function(season){
     nflversedata::nflverse_save(
       data_frame = stats_post_team,
       file_name =  glue::glue("stats_team_post_{season}"),
-      nflverse_type = "team stats: season level",
-      release_tag = "player_stats",
+      nflverse_type = "team stats: POST season",
+      release_tag = "stats_team",
       file_types = c("rds", "csv", "parquet", "qs", "csv.gz")
     )
   }
@@ -143,8 +143,8 @@ release_stats <- function(season){
     nflversedata::nflverse_save(
       data_frame = stats_regpost_team,
       file_name =  glue::glue("stats_team_regpost_{season}"),
-      nflverse_type = "team stats: season level",
-      release_tag = "player_stats",
+      nflverse_type = "team stats: REG+POST season",
+      release_tag = "stats_team",
       file_types = c("rds", "csv", "parquet", "qs", "csv.gz")
     )
   }
