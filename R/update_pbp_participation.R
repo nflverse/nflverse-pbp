@@ -1,35 +1,41 @@
 release_pbp_participation <- function(season) {
-    if (season < 2016){
-      cli::cli_alert_warning("No participation data for {.val {season}} season. Abort.")
-      return(NULL)
-    } else if (season <= 2023){
-      cli::cli_alert_warning("It seems like the {.val {season}} season is gone from the api. Skip to avoid loss of data.")
-      return(NULL)
-    }
-
-    plays_template <- tibble::tibble(
-      nflverse_game_id = character(0),
-      old_game_id = character(0),
-      play_id = integer(0),
-      possession_team = character(0),
-      offense_formation = character(0),
-      offense_personnel = character(0),
-      defenders_in_box = integer(0),
-      defense_personnel = character(0),
-      number_of_pass_rushers = integer(0),
-      players_on_play = character(0),
-      offense_players = character(0),
-      defense_players = character(0),
-      n_offense = integer(0),
-      n_defense = integer(0),
-      ngs_air_yards = double(0),
-      time_to_throw = double(0),
-      was_pressure = logical(0),
-      route = character(0),
-      defense_man_zone_type = character(0),
-      defense_coverage_type = character(0)
+  if (season < 2016) {
+    cli::cli_alert_warning(
+      "No participation data for {.val {season}} season. Abort."
     )
+    return(NULL)
+  } else if (season <= 2023) {
+    cli::cli_alert_warning(
+      "It seems like the {.val {season}} season is gone from the API. Skipping to avoid loss of data."
+    )
+    return(NULL)
+  }
 
+  plays_template <- tibble::tibble(
+    nflverse_game_id = character(0),
+    old_game_id = character(0),
+    play_id = integer(0),
+    possession_team = character(0),
+    offense_formation = character(0),
+    offense_personnel = character(0),
+    defenders_in_box = integer(0),
+    defense_personnel = character(0),
+    number_of_pass_rushers = integer(0),
+    players_on_play = character(0),
+    offense_players = character(0),
+    defense_players = character(0),
+    n_offense = integer(0),
+    n_defense = integer(0),
+    ngs_air_yards = double(0),
+    time_to_throw = double(0),
+    was_pressure = logical(0),
+    route = character(0),
+    defense_man_zone_type = character(0),
+    defense_coverage_type = character(0)
+  )
+
+  if (season <= 2023) {
+    # this code no longer works as the endpoint is no longer available. I am keeping it around for posterity's sake
     cli::cli_alert_info("Obtaining schedules...")
     games <- dplyr::bind_rows(
       ngsscrapR::scrape_schedule(season, seasonType = "REG"),
@@ -39,22 +45,27 @@ release_pbp_participation <- function(season) {
       dplyr::transmute(
         game_id = as.character(game_id),
         # SB exception
-        week = dplyr::case_when(!!season <  2021 & week == 22 ~ 21,
-                                !!season >= 2021 & week == 23 ~ 22,
-                                TRUE ~ week),
-        nflverse_game_id = paste(season,
-                                 stringr::str_pad(week,2,side = "left",0),
-                                 visitor_team_abbr,
-                                 home_team_abbr,
-                                 sep = "_")
+        week = dplyr::case_when(
+          !!season < 2021 & week == 22 ~ 21,
+          !!season >= 2021 & week == 23 ~ 22,
+          TRUE ~ week
+        ),
+        nflverse_game_id = paste(
+          season,
+          stringr::str_pad(week, 2, side = "left", 0),
+          visitor_team_abbr,
+          home_team_abbr,
+          sep = "_"
+        )
       )
 
     cli::cli_alert_info("Scraping participation data for {season}...")
     obtain_plays <- function() {
       p <- progressr::progressor(steps = length(games$game_id))
-      plays <- furrr::future_map_dfr(games$game_id,
-                              ngsscrapR::scrape_plays |>
-                                nflreadr::progressively(p)
+      plays <- furrr::future_map_dfr(
+        games$game_id,
+        ngsscrapR::scrape_plays |>
+          nflreadr::progressively(p)
       )
       return(plays)
     }
@@ -63,7 +74,7 @@ release_pbp_participation <- function(season) {
       plays <- purrr::possibly(obtain_plays)()
     })
 
-    if (nrow(plays) == 0){
+    if (nrow(plays) == 0) {
       cli::cli_alert_warning("Can't access data. Quitting here.")
       return(invisible(FALSE))
     }
@@ -72,10 +83,13 @@ release_pbp_participation <- function(season) {
       dplyr::mutate(
         game_id = as.character(game_id),
         # SB exception
-        week = dplyr::case_when(!!season <  2021 & week == 22 ~ 21,
-                                !!season >= 2021 & week == 23 ~ 22,
-                                TRUE ~ week),
-        players_on_play2 = players_on_play) |>
+        week = dplyr::case_when(
+          !!season < 2021 & week == 22 ~ 21,
+          !!season >= 2021 & week == 23 ~ 22,
+          TRUE ~ week
+        ),
+        players_on_play2 = players_on_play
+      ) |>
       dplyr::select(
         old_game_id = game_id,
         week,
@@ -99,7 +113,9 @@ release_pbp_participation <- function(season) {
         na_matches = "never"
       ) |>
       dplyr::left_join(
-        nflreadr::load_rosters_weekly(season) |> dplyr::select(gsis_id, week, team) |> dplyr::distinct(),
+        nflreadr::load_rosters_weekly(season) |>
+          dplyr::select(gsis_id, week, team) |>
+          dplyr::distinct(),
         by = c("gsis_id", "week"),
         na_matches = "never"
       ) |>
@@ -117,9 +133,13 @@ release_pbp_participation <- function(season) {
       # oak -> lv exception
       # dplyr::mutate(tmp_possession_team = nflreadr::clean_team_abbrs(possession_team, current_location = TRUE, keep_non_matches = TRUE)) |>
       dplyr::summarise(
-        offense_players = gsis_id[possession_team == team] |> na.omit() |> paste(collapse = ";"),
+        offense_players = gsis_id[possession_team == team] |>
+          na.omit() |>
+          paste(collapse = ";"),
         n_offense = gsis_id[possession_team == team] |> na.omit() |> length(),
-        defense_players = gsis_id[possession_team != team] |> na.omit() |> paste(collapse = ";"),
+        defense_players = gsis_id[possession_team != team] |>
+          na.omit() |>
+          paste(collapse = ";"),
         n_defense = gsis_id[possession_team != team] |> na.omit() |> length(),
         .groups = "drop"
       ) |>
@@ -129,10 +149,20 @@ release_pbp_participation <- function(season) {
         by = c("old_game_id" = "old_game_id")
       ) |>
       dplyr::left_join(
-        plays |> dplyr::mutate(old_game_id = as.character(game_id)) |>
-          dplyr::select(old_game_id, play_id, pass_info, rec_info, dplyr::any_of(
-            c('defense_man_zone_type', 'defense_coverage_type')
-          )) |> tidyr::unnest(pass_info) |> tidyr::unnest(rec_info) |> janitor::clean_names(),
+        plays |>
+          dplyr::mutate(old_game_id = as.character(game_id)) |>
+          dplyr::select(
+            old_game_id,
+            play_id,
+            pass_info,
+            rec_info,
+            dplyr::any_of(
+              c('defense_man_zone_type', 'defense_coverage_type')
+            )
+          ) |>
+          tidyr::unnest(pass_info) |>
+          tidyr::unnest(rec_info) |>
+          janitor::clean_names(),
         by = c("old_game_id" = "old_game_id", "play_id" = "play_id")
       ) |>
       dplyr::select(
@@ -154,23 +184,130 @@ release_pbp_participation <- function(season) {
         time_to_throw,
         was_pressure,
         route,
-        dplyr::any_of(c('defense_man_zone_type','defense_coverage_type'))
+        dplyr::any_of(c('defense_man_zone_type', 'defense_coverage_type'))
       )
-
-    current_participation <- nflreadr::load_participation(season) |>
-      dplyr::anti_join(plays, by = c("nflverse_game_id"))
-
-    plays <- dplyr::bind_rows(plays_template, current_participation, plays) |>
-      dplyr::arrange(nflverse_game_id)
-
-    cli::cli_process_start("Uploading participation data to nflverse-data")
-
-    nflversedata::nflverse_save(
-      data_frame = plays,
-      file_name = paste0("pbp_participation_", season),
-      nflverse_type = "pbp participation",
-      release_tag = "pbp_participation"
+  } else if (season >= 2024) {
+    plays <- nflreadr::load_from_url(
+      glue::glue(
+        "https://github.com/nflverse/nflverse-ftn/releases/download/raw/ftn_participation_{season}.rds"
+      )
     )
 
-    cli::cli_process_done()
+    ftn_data <- nflreadr::load_from_url(
+      "https://github.com/nflverse/nflverse-ftn/releases/download/raw/full_ftn_data.rds"
+    )
+
+    plays <- plays |>
+      dplyr::left_join(
+        ftn_data,
+        by = dplyr::join_by(
+          pid == ftn_play_id
+        )
+      ) |> # some plays are missing from `ftn_data`, so we use information from other games to grab this info
+      dplyr::group_by(gameId) |>
+      dplyr::mutate(
+        nflverse_game_id = data.table::fcoalesce(
+          nflverse_game_id,
+          nflreadr::stat_mode(nflverse_game_id)
+        )
+      ) |>
+      dplyr::left_join(
+        nflreadr::load_schedules(TRUE),
+        by = dplyr::join_by(nflverse_game_id == game_id)
+      ) |>
+      dplyr::left_join(
+        nflreadr::load_pbp(seasons = season),
+        by = dplyr::join_by(nflverse_game_id == game_id, nflplayid == play_id)
+      ) |>
+      dplyr::ungroup()
+
+    collapse_pos <- function(x) {
+      table(x) |>
+        tibble::enframe() |>
+        (\(x) paste(x$value, x$name))() |>
+        paste0(collapse = ", ")
+    }
+
+    personnel <- plays |>
+      dplyr::select(
+        gameId,
+        nflplayid,
+        posteam,
+        dplyr::starts_with("items"),
+        dplyr::starts_with("tmabbr"),
+        dplyr::starts_with("tmjers"),
+        dplyr::starts_with("gsisid"),
+      ) |>
+      dplyr::rename_with(\(x) gsub("items.", "", x, fixed = TRUE)) |>
+      tidyr::pivot_longer(
+        cols = -c(nflplayid, gameId, posteam),
+        values_transform = as.character
+      ) |>
+      tidyr::separate_wider_delim(
+        name,
+        names = c("name", "player_num"),
+        delim = "_"
+      ) |>
+      tidyr::pivot_wider(id_cols = c(nflplayid, gameId, player_num, posteam)) |>
+      dplyr::arrange(position) |>
+      dplyr::group_by(
+        gameId,
+        nflplayid
+      ) |>
+      dplyr::summarize(
+        offense_personnel = collapse_pos(position[posteam == tmabbr]),
+        defense_personnel = collapse_pos(position[posteam != tmabbr]),
+        players_on_play = paste0(gsisid, collapse = ";"),
+        offense_players = paste0(gsisid[posteam == tmabbr], collapse = ";"),
+        defense_players = paste0(gsisid[posteam != tmabbr], collapse = ';'),
+        n_offense = sum(posteam == tmabbr, na.rm = T),
+        n_defense = sum(posteam != tmabbr, na.rm = T),
+        .groups = "drop"
+      )
+
+    plays <- plays |>
+      dplyr::left_join(personnel, by = dplyr::join_by(gameId, nflplayid)) |>
+      dplyr::select(
+        nflverse_game_id,
+        old_game_id = old_game_id.x,
+        play_id = nflplayid,
+        possession_team = posteam,
+        offense_formation,
+        offense_personnel,
+        defenders_in_box,
+        defense_personnel,
+        number_of_pass_rushers = n_pass_rushers,
+        players_on_play,
+        offense_players,
+        defense_players,
+        n_offense,
+        n_defense,
+        ngs_air_yards = air_yards, # should we rename? potential breaking change
+        time_to_throw,
+        was_pressure,
+        route,
+        defense_man_zone_type,
+        defense_coverage_type
+      )
   }
+
+  current_participation <- nflreadr::load_participation(season)
+  if (nrow(current_participation)) {
+    current_participation <- current_participation |>
+      dplyr::anti_join(plays, by = c("nflverse_game_id"))
+  }
+
+  plays <- dplyr::bind_rows(plays_template, current_participation, plays) |>
+    dplyr::arrange(nflverse_game_id)
+
+  cli::cli_process_start("Uploading participation data to nflverse-data")
+
+  nflversedata::nflverse_save(
+    data_frame = plays,
+    file_name = paste0("pbp_participation_", season),
+    nflverse_type = "pbp participation",
+    release_tag = "pbp_participation"
+  )
+
+  cli::cli_process_done()
+}
