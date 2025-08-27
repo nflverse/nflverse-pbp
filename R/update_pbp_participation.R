@@ -280,6 +280,7 @@ release_pbp_participation <- function(season) {
 
     plays <- plays |>
       dplyr::left_join(personnel, by = dplyr::join_by(gameId, nflplayid)) |>
+      dplyr::mutate(ngs_air_yards = NA_real_,) |>
       dplyr::select(
         nflverse_game_id,
         old_game_id,
@@ -295,13 +296,12 @@ release_pbp_participation <- function(season) {
         defense_players,
         n_offense,
         n_defense,
-        ngs_air_yards = air_yards, # should we rename? potential breaking change
+        ngs_air_yards,
         time_to_throw,
         was_pressure,
         route,
         defense_man_zone_type,
         defense_coverage_type,
-        
       )
   }
 
