@@ -202,24 +202,24 @@ release_pbp_participation <- function(season) {
         ftn_data,
         by = dplyr::join_by(
           pid == ftn_play_id
-        )
+        ),
+        na_matches = "never"
       ) |> # some plays are missing from `ftn_data`, so we use information from other games to grab this info
       dplyr::group_by(gameId) |>
       dplyr::mutate(
         nflverse_game_id = data.table::fcoalesce(
           nflverse_game_id,
-          nflreadr::stat_mode(nflverse_game_id)
+          nflreadr::stat_mode(nflverse_game_id, na.rm = T)
         )
       ) |>
       dplyr::left_join(
-        nflreadr::load_schedules(TRUE),
-        by = dplyr::join_by(nflverse_game_id == game_id)
-      ) |>
-      dplyr::left_join(
         nflreadr::load_pbp(seasons = season),
-        by = dplyr::join_by(nflverse_game_id == game_id, nflplayid == play_id)
+        by = dplyr::join_by(nflverse_game_id == game_id, nflplayid == play_id),
+        na_matches = "never",
+        relationship = "one-to-one"
       ) |>
-      dplyr::ungroup()
+      dplyr::ungroup() |>
+      dplyr::mutate(posteam = data.table::fcoalesce(posteam, ""))
 
     collapse_pos <- function(x) {
       table(x) |>
@@ -229,6 +229,7 @@ release_pbp_participation <- function(season) {
     }
 
     personnel <- plays |>
+      dplyr::filter(posteam != "") |>
       dplyr::select(
         gameId,
         nflplayid,
@@ -262,6 +263,18 @@ release_pbp_participation <- function(season) {
         defense_players = paste0(gsisid[posteam != tmabbr], collapse = ';'),
         n_offense = sum(posteam == tmabbr, na.rm = T),
         n_defense = sum(posteam != tmabbr, na.rm = T),
+        offense_names = paste0(name[posteam == tmabbr], collapse = ";"),
+        defense_names = paste0(name[posteam != tmabbr], collapse = ";"),
+        offense_positions = paste0(position[posteam == tmabbr], collapse = ";"),
+        defense_positions = paste0(position[posteam != tmabbr], collapse = ";"),
+        offense_numbers = paste0(
+          uniformNumber[posteam == tmabbr],
+          collapse = ";"
+        ),
+        defense_numbers = paste0(
+          uniformNumber[posteam != tmabbr],
+          collapse = ";"
+        ),
         .groups = "drop"
       )
 
@@ -269,7 +282,7 @@ release_pbp_participation <- function(season) {
       dplyr::left_join(personnel, by = dplyr::join_by(gameId, nflplayid)) |>
       dplyr::select(
         nflverse_game_id,
-        old_game_id = old_game_id.x,
+        old_game_id,
         play_id = nflplayid,
         possession_team = posteam,
         offense_formation,
@@ -287,7 +300,8 @@ release_pbp_participation <- function(season) {
         was_pressure,
         route,
         defense_man_zone_type,
-        defense_coverage_type
+        defense_coverage_type,
+        
       )
   }
 
