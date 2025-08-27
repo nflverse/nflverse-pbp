@@ -305,6 +305,12 @@ release_pbp_participation <- function(season) {
         route,
         defense_man_zone_type,
         defense_coverage_type,
+        offense_names,
+        defense_names,
+        offense_positions,
+        defense_positions,
+        offense_numbers,
+        defense_numbers,
       )
   }
 
