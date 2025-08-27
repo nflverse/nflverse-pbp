@@ -280,7 +280,10 @@ release_pbp_participation <- function(season) {
 
     plays <- plays |>
       dplyr::left_join(personnel, by = dplyr::join_by(gameId, nflplayid)) |>
-      dplyr::mutate(ngs_air_yards = NA_real_,) |>
+      dplyr::mutate(
+        ngs_air_yards = NA_real_,
+        route = stringi::stri_trans_toupper(gsub("[0-9]{1,} - ", "", route))
+      ) |>
       dplyr::select(
         nflverse_game_id,
         old_game_id,
