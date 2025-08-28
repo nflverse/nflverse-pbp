@@ -212,13 +212,13 @@ release_pbp_participation <- function(season) {
           nflreadr::stat_mode(nflverse_game_id, na.rm = TRUE)
         )
       ) |>
+      dplyr::ungroup() |>
       dplyr::left_join(
         nflreadr::load_pbp(seasons = season),
         by = dplyr::join_by(nflverse_game_id == game_id, nflplayid == play_id),
         na_matches = "never",
         relationship = "one-to-one"
       ) |>
-      dplyr::ungroup() |>
       dplyr::mutate(posteam = data.table::fcoalesce(posteam, ""))
 
     collapse_pos <- function(x) {
