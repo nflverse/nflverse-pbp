@@ -325,7 +325,8 @@ release_pbp_participation <- function(season) {
   nflversedata::nflverse_save(
     data_frame = plays,
     file_name = paste0("pbp_participation_", season),
-    nflverse_type = "pbp participation",
+    nflverse_type = "Participation Data provided by FTNData.com",
+    file_types = c("rds", "parquet", "csv", "qs"),
     release_tag = "pbp_participation"
   )
 
