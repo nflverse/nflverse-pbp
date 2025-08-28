@@ -209,7 +209,7 @@ release_pbp_participation <- function(season) {
       dplyr::mutate(
         nflverse_game_id = data.table::fcoalesce(
           nflverse_game_id,
-          nflreadr::stat_mode(nflverse_game_id, na.rm = T)
+          nflreadr::stat_mode(nflverse_game_id, na.rm = TRUE)
         )
       ) |>
       dplyr::left_join(
@@ -261,8 +261,8 @@ release_pbp_participation <- function(season) {
         players_on_play = paste0(gsisid, collapse = ";"),
         offense_players = paste0(gsisid[posteam == tmabbr], collapse = ";"),
         defense_players = paste0(gsisid[posteam != tmabbr], collapse = ';'),
-        n_offense = sum(posteam == tmabbr, na.rm = T),
-        n_defense = sum(posteam != tmabbr, na.rm = T),
+        n_offense = sum(posteam == tmabbr, na.rm = TRUE),
+        n_defense = sum(posteam != tmabbr, na.rm = TRUE),
         offense_names = paste0(name[posteam == tmabbr], collapse = ";"),
         defense_names = paste0(name[posteam != tmabbr], collapse = ";"),
         offense_positions = paste0(position[posteam == tmabbr], collapse = ";"),
