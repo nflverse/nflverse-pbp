@@ -268,7 +268,7 @@ release_pbp_participation <- function(season) {
           defense_coverage_type == "9" ~ "COVER_9",
           defense_coverage_type == "C" ~ "COMBO",
           defense_coverage_type == "N" ~ "BLOWN",
-          T ~ NA_character_
+          TRUE ~ NA_character_
         )
       ) |>
       dplyr::select(
