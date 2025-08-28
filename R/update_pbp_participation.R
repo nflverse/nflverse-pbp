@@ -316,12 +316,9 @@ release_pbp_participation <- function(season) {
 
   current_participation <- nflreadr::load_participation(season)
   if (nrow(current_participation)) {
-    current_participation <- current_participation |>
-      dplyr::anti_join(plays, by = c("nflverse_game_id"))
+    plays <- current_participation |>
+      dplyr::rows_upsert(plays, by = c("nflverse_game_id", "play_id"))
   }
-
-  plays <- dplyr::bind_rows(plays_template, current_participation, plays) |>
-    dplyr::arrange(nflverse_game_id)
 
   cli::cli_process_start("Uploading participation data to nflverse-data")
 
