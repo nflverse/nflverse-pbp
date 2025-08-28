@@ -282,7 +282,22 @@ release_pbp_participation <- function(season) {
       dplyr::left_join(personnel, by = dplyr::join_by(gameId, nflplayid)) |>
       dplyr::mutate(
         ngs_air_yards = NA_real_,
-        route = stringi::stri_trans_toupper(gsub("[0-9]{1,} - ", "", route))
+        route = stringi::stri_trans_toupper(
+          gsub("[0-9]{1,} - ", "", route)
+        ),
+        defense_coverage_type = dplyr::case_when(
+          defense_coverage_type == "0" ~ "COVER_0",
+          defense_coverage_type == "1" ~ "COVER_1",
+          defense_coverage_type == "2" ~ "COVER_2",
+          defense_coverage_type == "2M" ~ "2_MAN",
+          defense_coverage_type == "3" ~ "COVER_3",
+          defense_coverage_type == "4" ~ "COVER_4",
+          defense_coverage_type == "6" ~ "COVER_6",
+          defense_coverage_type == "9" ~ "COVER_9",
+          defense_coverage_type == "C" ~ "COMBO",
+          defense_coverage_type == "N" ~ "BLOWN",
+          T ~ NA_character_
+        )
       ) |>
       dplyr::select(
         nflverse_game_id,
