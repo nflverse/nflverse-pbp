@@ -1,0 +1,13 @@
+name: Rate Limit
+on:
+  workflow_dispatch:
+
+jobs:
+  rate_limit_print:
+    name: Print Rate Limits
+    env:
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Rate Limits
+        run: "gh api rate_limit"
