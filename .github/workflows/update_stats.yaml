@@ -1,0 +1,78 @@
+# This is a special workflow that is meant to be triggered only manually
+# It is supposed to update only stats data (because it's quite new and we keep
+# fixing stuff that requires of older seasons as well)
+on:
+  workflow_dispatch:
+    inputs:
+      season_rebuild:
+        description: 'Rebuild Season (9999 defaults to latest season). Do multiple seasons comma separated, e.g. 2017,2019,2021'
+        required: false
+        default: 9999
+        type: number
+      full_rebuild:
+        description: 'Full Rebuild (overwrites above season)'
+        required: true
+        default: false
+        type: boolean
+
+name: Update Stats Data
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    name: setup
+    env:
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      FULL_REBUILD: ${{ inputs.full_rebuild || false }}
+      SEASON_REBUILD: ${{ inputs.season_rebuild || 9999 }}
+    outputs:
+      seasons: ${{ steps.query_seasons.outputs.seasons }}
+    steps:
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: nflverse/nflverse-workflows
+
+      - id: query_seasons
+        name: Query Seasons
+        run: |
+          if [ $FULL_REBUILD == true ]
+          then
+            seasons=$( Rscript -e 'nflverse.workflows::get_season_range(1999)' )
+          elif [ $SEASON_REBUILD == 9999 ]
+          then
+            seasons=$( Rscript -e 'nflverse.workflows::get_current_season()' )
+          else
+            seasons="[$SEASON_REBUILD]"
+          fi
+          echo "seasons=$seasons" >> "$GITHUB_OUTPUT"
+
+  update_stats:
+    needs: setup
+    name: Update ${{ matrix.season }} ${{ matrix.type }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        season: ${{ fromJson(needs.setup.outputs.seasons) }}
+        type: ["stats"]
+    env:
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
+      NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+          extra-repositories: 'https://nflverse.r-universe.dev'
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1
+          extra-packages: |
+            nflverse/nflverse-data
+            nflverse/fastrmodels
+      - name: Release ${{ matrix.type }}
+        run: Rscript -e 'source("R/update_data.R")'
