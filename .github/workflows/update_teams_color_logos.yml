@@ -3,8 +3,7 @@ on:
   push:
     paths: ["teams_colors_logos.csv"]
 
-name: update_teams_colors_logos.yaml
-
+name: Update Teams
 permissions: read-all
 
 jobs:
