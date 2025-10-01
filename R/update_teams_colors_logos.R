@@ -18,7 +18,7 @@ if (!identical(released, repo_data)) {
   nflversedata::nflverse_save(
     data_frame = out,
     file_name = "teams_colors_logos",
-    nflverse_type = "nflverse teams data",
+    nflverse_type = "teams data",
     release_tag = "teams",
     file_types = c("rds", "csv", "parquet", "qs", "csv.gz"),
   )
