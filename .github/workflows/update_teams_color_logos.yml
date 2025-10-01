@@ -1,0 +1,31 @@
+on:
+  workflow_dispatch:
+  push:
+    paths: ["teams_colors_logos.csv"]
+
+name: update_teams_colors_logos.yaml
+
+permissions: read-all
+
+jobs:
+  update_teams:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+          extra-repositories: 'https://nflverse.r-universe.dev'
+
+      - name: Install dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: nflverse/nflverse-data
+
+      - name: Release teams data
+        run: Rscript -e 'source("R/update_teams_colors_logos.R")'
