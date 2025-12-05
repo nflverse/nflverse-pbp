@@ -83,6 +83,7 @@ jobs:
           extra-packages: |
             nflverse/nflverse-data
             nflverse/fastrmodels
+            cran/xgboost@1.7.11.1
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
 
