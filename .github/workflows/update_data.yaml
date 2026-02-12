@@ -1,16 +1,16 @@
 on:
-  schedule:
+  #schedule:
     # Every day at 9:00 UTC/5:00 ET
-    - cron:  '0 9 * 1,2,9-12 *'
+  #  - cron:  '0 9 * 1,2,9-12 *'
     # TNF 5:30 AM UTC / 12:30 AM ET
-    - cron:  '30 5 * 1,2,9-12 5'
+  #  - cron:  '30 5 * 1,2,9-12 5'
     # Early window: 10:00 PM UTC / 5:00 PM ET
-    - cron:  '00 22 * 1,2,9-12 0'
+  #  - cron:  '00 22 * 1,2,9-12 0'
     # Late window: 0:00 UTC / 8:00 ET
-    - cron:  '5 0 * 1,2,9-12 1'
+  #  - cron:  '5 0 * 1,2,9-12 1'
     # SNF/MNF: 5:30 UTC / 12:30 ET
-    - cron:  '30 5 * 1,2,9-12 1'
-    - cron:  '30 5 * 1,2,9-12 2'
+  #  - cron:  '30 5 * 1,2,9-12 1'
+  #  - cron:  '30 5 * 1,2,9-12 2'
   workflow_dispatch:
     inputs:
       season_rebuild:
