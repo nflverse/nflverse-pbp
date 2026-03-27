@@ -21,7 +21,7 @@ if (!identical(released, repo_data)) {
     file_name = "teams_colors_logos",
     nflverse_type = "teams data",
     release_tag = "teams",
-    file_types = c("rds", "csv", "parquet", "qs", "csv.gz"),
+    file_types = c("rds", "csv", "parquet", "csv.gz"),
   )
 } else {
   cli::cli_alert_success("Nothing changed. Teams data is up to date.")
