@@ -48,7 +48,7 @@ jobs:
         run: |
           if [ $FULL_REBUILD == true ]
           then
-            seasons=$( Rscript -e 'nflverse.workflows::get_season_range(1999)' )
+            seasons=$( Rscript -e 'nflverse.workflows::get_season_range(2001)' )
           elif [ $SEASON_REBUILD == 9999 ]
           then
             seasons=$( Rscript -e 'nflverse.workflows::get_current_season()' )
@@ -56,7 +56,6 @@ jobs:
             seasons="[$SEASON_REBUILD]"
           fi
           echo "seasons=$seasons" >> "$GITHUB_OUTPUT"
-
 
   update_pbp:
     needs: pbp_setup
@@ -83,7 +82,6 @@ jobs:
           extra-packages: |
             nflverse/nflverse-data
             nflverse/fastrmodels
-            qsbase/qs
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
 
@@ -113,33 +111,5 @@ jobs:
           extra-packages: |
             nflverse/nflverse-data
             nflverse/fastrmodels
-            qsbase/qs
-      - name: Release ${{ matrix.type }}
-        run: Rscript -e 'source("R/update_data.R")'
-
-  combine_stats:
-    needs: [pbp_setup, update_stats]
-    name: Build ${{ matrix.type }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        type: ["laterals"]
-    env:
-      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
-      NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          use-public-rspm: true
-          extra-repositories: 'https://nflverse.r-universe.dev'
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          cache-version: 1
-          extra-packages: |
-            nflverse/nflverse-data
-            nflverse/fastrmodels
-            qsbase/qs
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("R/update_data.R")'
