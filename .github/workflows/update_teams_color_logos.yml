@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: nflverse/nflverse-data
+          extra-packages: nflverse/nflverse-data
 
       - name: Release teams data
         run: Rscript -e 'source("R/update_teams_colors_logos.R")'

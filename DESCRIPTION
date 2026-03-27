@@ -25,7 +25,6 @@ Imports:
     nflreadr (>= 1.1.0),
     cli (>= 3.0.0),
     arrow (>= 5.0.0),
-    qs (>= 0.24.1),
     callr (>= 3.7.0),
     readr (>= 2.0.0),
     dplyr (>= 1.0.7),
