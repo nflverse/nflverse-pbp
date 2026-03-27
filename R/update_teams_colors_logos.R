@@ -1,13 +1,21 @@
 cli::rule("Start teams data update process")
 
 # Load currently released data
-released <- data.table::fread(paste0(
-  "https://github.com/nflverse/nflverse-data/",
-  "releases/download/teams/teams_colors_logos.csv"
-), na.strings = "")
+released <- data.table::fread(
+  paste0(
+    "https://github.com/nflverse/nflverse-data/",
+    "releases/download/teams/teams_colors_logos.csv"
+  ),
+  na.strings = "",
+  keepLeadingZeros = TRUE
+)
 
 # Load data in nflverse-pbp repo
-repo_data <- data.table::fread("teams_colors_logos.csv", na.strings = "")
+repo_data <- data.table::fread(
+  "teams_colors_logos.csv",
+  na.strings = "",
+  keepLeadingZeros = TRUE
+)
 
 # The workflow should only trigger if the data changed but it doesn't hurt
 # to make sure we only update the data if the comparison shows that something
