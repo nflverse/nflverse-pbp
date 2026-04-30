@@ -25,7 +25,7 @@ release_pbp <- function(season) {
       file_name =  glue::glue("play_by_play_{season}"),
       nflverse_type = "play by play data",
       release_tag = "pbp",
-      file_types = c("rds","csv","parquet","qs", "csv.gz")
+      file_types = c("rds","csv","parquet", "csv.gz")
     )
 
     cli::cli_alert_success("Saved {season} pbp data.")

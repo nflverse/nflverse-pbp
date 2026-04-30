@@ -75,4 +75,4 @@ jobs:
             nflverse/nflverse-data
             nflverse/fastrmodels
       - name: Release ${{ matrix.type }}
-        run: Rscript -e 'source("R/update_data.R")'
+        run: Rscript -e 'source("exec/update_data.R")'

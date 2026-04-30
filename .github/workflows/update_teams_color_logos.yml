@@ -27,4 +27,4 @@ jobs:
           extra-packages: nflverse/nflverse-data
 
       - name: Release teams data
-        run: Rscript -e 'source("R/update_teams_colors_logos.R")'
+        run: Rscript -e 'source("exec/update_teams_colors_logos.R")'

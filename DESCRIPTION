@@ -1,6 +1,6 @@
 Package: nflfastr.data
 Title: Data repository of player-level game data
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: 
     c(person(given = "Ben",
              family = "Baldwin",
