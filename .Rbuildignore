@@ -8,3 +8,5 @@
 ^wordmarks$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.positai$
+^\.claude$
