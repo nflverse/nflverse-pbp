@@ -7,33 +7,25 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       GITHUB_PAT: ${{ secrets.NFLVERSE_GH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v6
-
       - uses: r-lib/actions/setup-r@v2
-        with:
-          use-public-rspm: true
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-           cache-version: 1
-           extra-packages: |
-            nflverse/nflfastR
-            nflverse/nflreadr
-            nflverse/nflverse-data
-            ropensci/piggyback
+           packages: |
+            logger
 
       - name: Run update script
         run: |
-          writeLines(paste0("export NFLFASTR_VERSION=",as.character(packageVersion("nflfastR"))),".ver")
-          writeLines(as.character(runif(1)),"blob.txt")
-          nflversedata::nflverse_upload("blob.txt","pbp")
+          logger::log_layout(logger::layout_gha)
+          logger::log_with_separator("Test dhjwelhdjiow2hqdjiow2 hdjio 2hwqjdio 2hewqdij oh2uwi oqdhujw2i oqhduio")
+          logger::log_success("This was successful")
+          logger::log_error("This is an error")
+          logger::log_tictoc("starting a timer")
+          Sys.sleep(1)
+          logger::log_tictoc("ending a timer")
+          logger::log_failure("This should fail now")
         shell: Rscript {0}
-
-      - name: Commit results
-        run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          source .ver
