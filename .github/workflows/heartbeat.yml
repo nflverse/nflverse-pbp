@@ -8,7 +8,7 @@ jobs:
     name: heartbeat
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: Commit heartbeat
         run: |
           git config --local user.email "actions@github.com"
