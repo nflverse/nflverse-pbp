@@ -4,8 +4,8 @@ on:
       season_rebuild:
         description: 'Rebuild Season (9999 defaults to latest season). Do multiple seasons comma separated, e.g. 2017,2019,2021'
         required: false
-        default: 9999
-        type: number
+        default: '9999'
+        type: string
       full_rebuild:
         description: 'Full Rebuild (overwrites above season)'
         required: true
