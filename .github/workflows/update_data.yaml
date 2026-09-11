@@ -33,7 +33,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       FULL_REBUILD: ${{ inputs.full_rebuild || false }}
-      SEASON_REBUILD: ${{ inputs.season_rebuild }}
+      SEASON_REBUILD: ${{ inputs.season_rebuild || '9999' }}
     outputs:
       seasons: ${{ steps.query_seasons.outputs.seasons }}
     steps:
