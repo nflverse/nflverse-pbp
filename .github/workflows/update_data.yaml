@@ -16,8 +16,8 @@ on:
       season_rebuild:
         description: 'Rebuild Season (9999 defaults to latest season). Do multiple seasons comma separated, e.g. 2017,2019,2021'
         required: false
-        default: 9999
-        type: number
+        default: '9999'
+        type: string
       full_rebuild:
         description: 'Full Rebuild (overwrites above season)'
         required: true
@@ -33,7 +33,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       FULL_REBUILD: ${{ inputs.full_rebuild || false }}
-      SEASON_REBUILD: ${{ inputs.season_rebuild || 9999 }}
+      SEASON_REBUILD: ${{ inputs.season_rebuild }}
     outputs:
       seasons: ${{ steps.query_seasons.outputs.seasons }}
     steps:
@@ -46,15 +46,18 @@ jobs:
       - id: query_seasons
         name: Query Seasons
         run: |
-          if [ $FULL_REBUILD == true ]
-          then
+          if [ "$FULL_REBUILD" == "true" ]; then
             seasons=$( Rscript -e 'nflverse.workflows::get_season_range(2001)' )
-          elif [ $SEASON_REBUILD == 9999 ]
-          then
+
+          elif [-z "$SEASON_REBUILD"] ||
+               [ "$SEASON_REBUILD" == "9999" ] ||
+               [ "$SEASON_REBUILD" == "9999.0" ]; then
             seasons=$( Rscript -e 'nflverse.workflows::get_current_season()' )
+
           else
             seasons="[$SEASON_REBUILD]"
           fi
+
           echo "seasons=$seasons" >> "$GITHUB_OUTPUT"
 
   update_pbp:
