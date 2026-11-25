@@ -1,7 +1,11 @@
 release_stats <- function(season){
-  cli::cli_progress_step("Starting {.fct nflfastR::calculate_stats} for {season}!")
+  started <- Sys.time()
 
   # WEEK LEVEL SUMMARY #########################################################
+
+  # Each step is closed before its uploads start, otherwise cli keeps redrawing
+  # the open step below every upload message
+  cli::cli_progress_step("Calculating {season} week level player and team stats")
 
   stats_week_player <- nflfastR::calculate_stats(
     seasons = season,
@@ -16,6 +20,8 @@ release_stats <- function(season){
     stat_type = "team"
   )
   attr(stats_week_team, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
+
+  cli::cli_progress_done()
 
   if (nrow(stats_week_player) > 0){
     nflversedata::nflverse_save(
@@ -41,6 +47,8 @@ release_stats <- function(season){
 
   # PLAYER SEASON LEVEL SUMMARY ################################################
 
+  cli::cli_progress_step("Calculating {season} season level player stats (REG, POST, REG+POST)")
+
   stats_reg_player <- nflfastR::calculate_stats(
     seasons = season,
     summary_level = "season",
@@ -64,6 +72,8 @@ release_stats <- function(season){
     season_type = "REG+POST"
   )
   attr(stats_regpost_player, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
+
+  cli::cli_progress_done()
 
   if (nrow(stats_reg_player) > 0){
     nflversedata::nflverse_save(
@@ -100,6 +110,8 @@ release_stats <- function(season){
 
   # TEAM SEASON LEVEL SUMMARY ##################################################
 
+  cli::cli_progress_step("Calculating {season} season level team stats (REG, POST, REG+POST)")
+
   stats_reg_team <- nflfastR::calculate_stats(
     seasons = season,
     summary_level = "season",
@@ -123,6 +135,8 @@ release_stats <- function(season){
     season_type = "REG+POST"
   )
   attr(stats_regpost_team, "nflfastR_version") <- as.character(packageVersion("nflfastR"))
+
+  cli::cli_progress_done()
 
   if (nrow(stats_reg_team) > 0){
     nflversedata::nflverse_save(
@@ -167,6 +181,18 @@ release_stats <- function(season){
   if (n_player > 0) nflversedata::nflverse_upload_timestamp(tag = "stats_player")
   if (n_team > 0) nflversedata::nflverse_upload_timestamp(tag = "stats_team")
 
-  cli::cli_progress_done()
+  n_released <- sum(vapply(
+    list(
+      stats_week_player, stats_week_team,
+      stats_reg_player, stats_post_player, stats_regpost_player,
+      stats_reg_team, stats_post_team, stats_regpost_team
+    ),
+    nrow,
+    integer(1)
+  ) > 0)
+  runtime <- format(round(difftime(Sys.time(), started), 1))
+  cli::cli_alert_success(
+    "Released {season} stats: {n_released} dataset{?s} in {runtime}."
+  )
   invisible(NULL)
 }
