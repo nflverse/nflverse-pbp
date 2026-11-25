@@ -42,15 +42,6 @@ concurrency:
   group: update-pbp-data
   cancel-in-progress: false
 
-# GitHub rate limits release uploads (secondary rate limit): ~80 content-creating
-# requests per minute and ~500 per hour per account. Replacing a release asset
-# costs 2 of them (delete + upload).
-#
-# Uploads use a GitHub App token if the repo/org variable
-# NFLVERSE_UPLOAD_APP_CLIENT_ID and the secret NFLVERSE_UPLOAD_APP_KEY are set.
-# The App has its own rate limit budget. Otherwise uploads fall back to the
-# shared NFLVERSE_GH_TOKEN, which other nflverse workflows use as well.
-
 jobs:
   pbp_setup:
     runs-on: ubuntu-latest
@@ -59,15 +50,10 @@ jobs:
       FULL_REBUILD: ${{ inputs.full_rebuild || false }}
       SEASON_REBUILD: ${{ inputs.season_rebuild || '9999' }}
       DATASETS: ${{ inputs.datasets || 'all' }}
-      HAS_UPLOAD_APP: ${{ vars.NFLVERSE_UPLOAD_APP_CLIENT_ID != '' }}
     outputs:
       seasons: ${{ steps.query_seasons.outputs.seasons }}
       pbp_types: ${{ steps.query_seasons.outputs.pbp_types }}
       run_stats: ${{ steps.query_seasons.outputs.run_stats }}
-      pbp_parallel: ${{ steps.query_seasons.outputs.pbp_parallel }}
-      stats_parallel: ${{ steps.query_seasons.outputs.stats_parallel }}
-      pbp_writes_per_hour: ${{ steps.query_seasons.outputs.pbp_writes_per_hour }}
-      stats_writes_per_hour: ${{ steps.query_seasons.outputs.stats_writes_per_hour }}
     steps:
       # Plain bash + jq (both preinstalled on the runner), no R setup needed.
       # Season logic mirrors nflverse.workflows::get_current_season(): the new
@@ -117,31 +103,11 @@ jobs:
             *) echo "::error::Unknown datasets value '$DATASETS'"; exit 1 ;;
           esac
 
-          # Upload pacing. A single season (scheduled runs) is small enough to
-          # upload at full speed. Multi season rebuilds share an hourly budget
-          # of content-creating requests across all parallel jobs. The shared
-          # PAT gets less so other nflverse workflows still have room.
-          pbp_parallel=6
-          stats_parallel=1
-          if [ "$HAS_UPLOAD_APP" == "true" ]; then budget=450; else budget=300; fi
-          if [ "$(jq length <<< "$seasons")" -gt 1 ]; then
-            pbp_writes_per_hour=$(( budget / pbp_parallel ))
-            stats_writes_per_hour=$(( budget / stats_parallel ))
-          else
-            pbp_writes_per_hour=""
-            stats_writes_per_hour=""
-          fi
-
           echo "Seasons: $seasons | pbp jobs: $pbp_types | stats: $run_stats"
-          echo "Upload app: $HAS_UPLOAD_APP | writes/hour per job: pbp=${pbp_writes_per_hour:-unlimited} stats=${stats_writes_per_hour:-unlimited}"
           {
             echo "seasons=$seasons"
             echo "pbp_types=$pbp_types"
             echo "run_stats=$run_stats"
-            echo "pbp_parallel=$pbp_parallel"
-            echo "stats_parallel=$stats_parallel"
-            echo "pbp_writes_per_hour=$pbp_writes_per_hour"
-            echo "stats_writes_per_hour=$stats_writes_per_hour"
           } >> "$GITHUB_OUTPUT"
 
   update_pbp:
@@ -151,11 +117,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: ${{ fromJson(needs.pbp_setup.outputs.pbp_parallel) }}
+      # Many jobs uploading release assets at the same moment trip GitHub's
+      # secondary rate limit. Limit how many seasons run at once.
+      max-parallel: 6
       matrix:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
         type: ${{ fromJson(needs.pbp_setup.outputs.pbp_types) }}
     env:
+      # used by the gh cli for release uploads
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       # pak reads GITHUB_PAT to resolve GitHub packages. Without it pak uses the
       # public "bundled" PAT. Use this repo's own token so package installs
       # don't eat into the rate limits of the upload token.
@@ -174,24 +144,7 @@ jobs:
           extra-packages: |
             nflverse/nflverse-data
             nflverse/fastrmodels
-      # App tokens expire after 1 hour, so create it right before it's needed
-      - name: Create upload token
-        id: upload_token
-        if: vars.NFLVERSE_UPLOAD_APP_CLIENT_ID != ''
-        uses: actions/create-github-app-token@v3
-        with:
-          client-id: ${{ vars.NFLVERSE_UPLOAD_APP_CLIENT_ID }}
-          private-key: ${{ secrets.NFLVERSE_UPLOAD_APP_KEY }}
-          owner: nflverse
-          repositories: |
-            nflverse-data
-            nflverse-pbp
-          permission-contents: write
       - name: Release ${{ matrix.type }}
-        env:
-          # used by the gh cli for release uploads
-          GH_TOKEN: ${{ steps.upload_token.outputs.token || secrets.NFLVERSE_GH_TOKEN }}
-          NFLVERSE.UPLOAD.WRITES_PER_HOUR: ${{ needs.pbp_setup.outputs.pbp_writes_per_hour }}
         run: Rscript -e 'source("exec/update_data.R")'
 
   update_stats:
@@ -206,13 +159,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # stats uploads 8 datasets x 4 files per season. Multi season rebuilds
-      # run one season at a time and are paced by NFLVERSE.UPLOAD.WRITES_PER_HOUR
-      max-parallel: ${{ fromJson(needs.pbp_setup.outputs.stats_parallel) }}
+      # stats uploads 8 datasets per season. More than 4 seasons uploading at
+      # once tripped GitHub's secondary rate limit in the past.
+      max-parallel: 4
       matrix:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
         type: ["stats"]
     env:
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       GITHUB_PAT: ${{ github.token }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
@@ -228,20 +182,5 @@ jobs:
           extra-packages: |
             nflverse/nflverse-data
             nflverse/fastrmodels
-      - name: Create upload token
-        id: upload_token
-        if: vars.NFLVERSE_UPLOAD_APP_CLIENT_ID != ''
-        uses: actions/create-github-app-token@v3
-        with:
-          client-id: ${{ vars.NFLVERSE_UPLOAD_APP_CLIENT_ID }}
-          private-key: ${{ secrets.NFLVERSE_UPLOAD_APP_KEY }}
-          owner: nflverse
-          repositories: |
-            nflverse-data
-            nflverse-pbp
-          permission-contents: write
       - name: Release ${{ matrix.type }}
-        env:
-          GH_TOKEN: ${{ steps.upload_token.outputs.token || secrets.NFLVERSE_GH_TOKEN }}
-          NFLVERSE.UPLOAD.WRITES_PER_HOUR: ${{ needs.pbp_setup.outputs.stats_writes_per_hour }}
         run: Rscript -e 'source("exec/update_data.R")'
