@@ -1,12 +1,6 @@
 release_pbp <- function(season) {
 
-  pbp_dir <- file.path(tempdir(check = TRUE), "pbp")
-  if (!dir.exists(pbp_dir)) dir.create(pbp_dir)
-
-  options("nflfastR.raw_directory" = pbp_dir)
-
-  ids <- nflfastR::missing_raw_pbp(seasons = season)
-  load <- nflfastR::save_raw_pbp(ids)
+  ids <- prepare_raw_pbp(season)
   pbp <- nflfastR::build_nflfastR_pbp(ids)
 
   n_pbp_ids <- length(unique(pbp$game_id))
@@ -25,7 +19,8 @@ release_pbp <- function(season) {
       file_name =  glue::glue("play_by_play_{season}"),
       nflverse_type = "play by play data",
       release_tag = "pbp",
-      file_types = c("rds","csv","parquet", "csv.gz")
+      file_types = c("rds","csv","parquet", "csv.gz"),
+      timestamp = upload_timestamps()
     )
 
     cli::cli_alert_success("Saved {season} pbp data.")
