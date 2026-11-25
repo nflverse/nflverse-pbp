@@ -23,7 +23,8 @@ release_stats <- function(season){
       file_name =  glue::glue("stats_player_week_{season}"),
       nflverse_type = "player stats: week level",
       release_tag = "stats_player",
-      file_types = c("rds", "csv", "parquet", "csv.gz")
+      file_types = c("rds", "csv", "parquet", "csv.gz"),
+      timestamp = FALSE
     )
   }
 
@@ -33,7 +34,8 @@ release_stats <- function(season){
       file_name =  glue::glue("stats_team_week_{season}"),
       nflverse_type = "team stats: week level",
       release_tag = "stats_team",
-      file_types = c("rds", "csv", "parquet", "csv.gz")
+      file_types = c("rds", "csv", "parquet", "csv.gz"),
+      timestamp = FALSE
     )
   }
 
@@ -69,7 +71,8 @@ release_stats <- function(season){
       file_name =  glue::glue("stats_player_reg_{season}"),
       nflverse_type = "player stats: REG season",
       release_tag = "stats_player",
-      file_types = c("rds", "csv", "parquet", "csv.gz")
+      file_types = c("rds", "csv", "parquet", "csv.gz"),
+      timestamp = FALSE
     )
   }
 
@@ -79,7 +82,8 @@ release_stats <- function(season){
       file_name =  glue::glue("stats_player_post_{season}"),
       nflverse_type = "player stats: POST season",
       release_tag = "stats_player",
-      file_types = c("rds", "csv", "parquet", "csv.gz")
+      file_types = c("rds", "csv", "parquet", "csv.gz"),
+      timestamp = FALSE
     )
   }
 
@@ -89,7 +93,8 @@ release_stats <- function(season){
       file_name =  glue::glue("stats_player_regpost_{season}"),
       nflverse_type = "player stats: REG+POST season",
       release_tag = "stats_player",
-      file_types = c("rds", "csv", "parquet", "csv.gz")
+      file_types = c("rds", "csv", "parquet", "csv.gz"),
+      timestamp = FALSE
     )
   }
 
@@ -125,7 +130,8 @@ release_stats <- function(season){
       file_name =  glue::glue("stats_team_reg_{season}"),
       nflverse_type = "team stats: REG season",
       release_tag = "stats_team",
-      file_types = c("rds", "csv", "parquet", "csv.gz")
+      file_types = c("rds", "csv", "parquet", "csv.gz"),
+      timestamp = FALSE
     )
   }
 
@@ -135,7 +141,8 @@ release_stats <- function(season){
       file_name =  glue::glue("stats_team_post_{season}"),
       nflverse_type = "team stats: POST season",
       release_tag = "stats_team",
-      file_types = c("rds", "csv", "parquet", "csv.gz")
+      file_types = c("rds", "csv", "parquet", "csv.gz"),
+      timestamp = FALSE
     )
   }
 
@@ -145,9 +152,20 @@ release_stats <- function(season){
       file_name =  glue::glue("stats_team_regpost_{season}"),
       nflverse_type = "team stats: REG+POST season",
       release_tag = "stats_team",
-      file_types = c("rds", "csv", "parquet", "csv.gz")
+      file_types = c("rds", "csv", "parquet", "csv.gz"),
+      timestamp = FALSE
     )
   }
+
+  # The datasets above were uploaded without the release timestamp files to
+  # save requests against GitHub's secondary rate limit. Upload them once per
+  # release instead of with every dataset.
+  n_player <- nrow(stats_week_player) + nrow(stats_reg_player) +
+    nrow(stats_post_player) + nrow(stats_regpost_player)
+  n_team <- nrow(stats_week_team) + nrow(stats_reg_team) +
+    nrow(stats_post_team) + nrow(stats_regpost_team)
+  if (n_player > 0) nflversedata::nflverse_upload_timestamp(tag = "stats_player")
+  if (n_team > 0) nflversedata::nflverse_upload_timestamp(tag = "stats_team")
 
   cli::cli_progress_done()
   invisible(NULL)

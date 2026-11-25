@@ -1,12 +1,6 @@
 release_pbp <- function(season) {
 
-  pbp_dir <- file.path(tempdir(check = TRUE), "pbp")
-  if (!dir.exists(pbp_dir)) dir.create(pbp_dir)
-
-  options("nflfastR.raw_directory" = pbp_dir)
-
-  ids <- nflfastR::missing_raw_pbp(seasons = season)
-  load <- nflfastR::save_raw_pbp(ids)
+  ids <- prepare_raw_pbp(season)
   pbp <- nflfastR::build_nflfastR_pbp(ids)
 
   n_pbp_ids <- length(unique(pbp$game_id))
