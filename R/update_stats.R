@@ -171,15 +171,17 @@ release_stats <- function(season){
     )
   }
 
-  # The datasets above were uploaded without the release timestamp files to
-  # save requests against GitHub's secondary rate limit. Upload them once per
-  # release instead of with every dataset.
+  # The datasets above were uploaded without the release timestamp files.
+  # Upload them once per release instead of with every dataset (unless the
+  # workflow uploads them once per run, see R/timestamps.R).
   n_player <- nrow(stats_week_player) + nrow(stats_reg_player) +
     nrow(stats_post_player) + nrow(stats_regpost_player)
   n_team <- nrow(stats_week_team) + nrow(stats_reg_team) +
     nrow(stats_post_team) + nrow(stats_regpost_team)
-  if (n_player > 0) nflversedata::nflverse_upload_timestamp(tag = "stats_player")
-  if (n_team > 0) nflversedata::nflverse_upload_timestamp(tag = "stats_team")
+  if (upload_timestamps()) {
+    if (n_player > 0) nflversedata::nflverse_upload_timestamp(tag = "stats_player")
+    if (n_team > 0) nflversedata::nflverse_upload_timestamp(tag = "stats_team")
+  }
 
   n_released <- sum(vapply(
     list(

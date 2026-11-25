@@ -54,6 +54,7 @@ jobs:
       seasons: ${{ steps.query_seasons.outputs.seasons }}
       pbp_types: ${{ steps.query_seasons.outputs.pbp_types }}
       run_stats: ${{ steps.query_seasons.outputs.run_stats }}
+      started_at: ${{ steps.query_seasons.outputs.started_at }}
     steps:
       # Plain bash + jq (both preinstalled on the runner), no R setup needed.
       # Season logic mirrors nflverse.workflows::get_current_season(): the new
@@ -62,6 +63,9 @@ jobs:
         name: Query Seasons
         run: |
           set -euo pipefail
+
+          # used by the upload_timestamps job to find releases this run updated
+          echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
           year=$(date -u +%Y)
           sep1_dow=$(date -u -d "$year-09-01" +%u) # 1 = Monday ... 7 = Sunday
@@ -132,6 +136,8 @@ jobs:
       GITHUB_PAT: ${{ github.token }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
+      # timestamps are uploaded once per run by the upload_timestamps job
+      NFLVERSE_UPLOAD_TIMESTAMPS: "false"
     steps:
       - uses: actions/checkout@v6
       - uses: r-lib/actions/setup-r@v2
@@ -170,6 +176,8 @@ jobs:
       GITHUB_PAT: ${{ github.token }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
+      # timestamps are uploaded once per run by the upload_timestamps job
+      NFLVERSE_UPLOAD_TIMESTAMPS: "false"
     steps:
       - uses: actions/checkout@v6
       - uses: r-lib/actions/setup-r@v2
@@ -184,3 +192,64 @@ jobs:
             nflverse/fastrmodels
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("exec/update_data.R")'
+
+  # Upload timestamp.txt and timestamp.json once per release instead of once per
+  # matrix job. A release gets a new timestamp if at least one of its data files
+  # was updated during this run, i.e. at least one job for it succeeded.
+  upload_timestamps:
+    needs: [pbp_setup, update_pbp, update_stats]
+    if: ${{ !cancelled() && needs.pbp_setup.result == 'success' }}
+    name: Upload release timestamps
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      STARTED_AT: ${{ needs.pbp_setup.outputs.started_at }}
+      PBP_TYPES: ${{ needs.pbp_setup.outputs.pbp_types }}
+      RUN_STATS: ${{ needs.pbp_setup.outputs.run_stats }}
+    steps:
+      - name: Upload release timestamps
+        run: |
+          set -euo pipefail
+
+          # Same format as nflversedata::nflverse_upload(), i.e.
+          # format(Sys.time(), tz = nflreadr::nflverse_data_timezone, usetz = TRUE)
+          now=$(TZ=America/Toronto date '+%Y-%m-%d %H:%M:%S %Z')
+          dir=$(mktemp -d)
+          printf '%s\n' "$now" > "$dir/timestamp.txt"
+          printf '{"last_updated":"%s"}\n' "$now" > "$dir/timestamp.json"
+
+          # "repo tag" of every release this run writes to
+          types=$(jq -r '.[] | split(",")[]' <<< "$PBP_TYPES")
+          releases=()
+          if grep -qx pbp <<< "$types"; then releases+=("nflverse/nflverse-data pbp"); fi
+          if grep -qx pbp_stats <<< "$types"; then releases+=("nflverse/nflverse-pbp playstats"); fi
+          if [ "$RUN_STATS" == "true" ]; then
+            releases+=("nflverse/nflverse-data stats_player" "nflverse/nflverse-data stats_team")
+          fi
+
+          for release in "${releases[@]}"; do
+            read -r repo tag <<< "$release"
+            id=$(gh api "repos/$repo/releases/tags/$tag" --jq .id)
+            # data assets (not timestamps) uploaded since this run started
+            updated=$(gh api --paginate "repos/$repo/releases/$id/assets?per_page=100" \
+              --jq "[.[] | select((.name | startswith(\"timestamp.\") | not) and .updated_at >= \"$STARTED_AT\")] | length" \
+              | awk '{ n += $1 } END { print n + 0 }')
+
+            if [ "$updated" -eq 0 ]; then
+              echo "::warning::No file in $repo@$tag was updated in this run. Keeping its timestamp."
+              continue
+            fi
+
+            # retry random GitHub server errors
+            for attempt in 1 2 3 4 5; do
+              if gh release upload "$tag" "$dir/timestamp.txt" "$dir/timestamp.json" -R "$repo" --clobber; then
+                echo "Updated timestamp of $repo@$tag ($updated files updated in this run): $now"
+                break
+              fi
+              if [ "$attempt" -eq 5 ]; then
+                echo "::error::Failed to upload timestamps to $repo@$tag"
+                exit 1
+              fi
+              sleep $(( attempt * 30 ))
+            done
+          done

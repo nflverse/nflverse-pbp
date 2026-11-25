@@ -17,7 +17,8 @@ release_pbp_stats <- function(season) {
     nflverse_type = "play by play stats",
     release_tag = "playstats",
     file_types = c("rds"),
-    repo = "nflverse/nflverse-pbp"
+    repo = "nflverse/nflverse-pbp",
+    timestamp = upload_timestamps()
   )
 
   cli::cli_alert_success("Saved {season} play stats data.")

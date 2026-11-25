@@ -16,6 +16,7 @@ if (length(invalid) > 0 || length(types) == 0) {
 # Run parallel
 future::plan("multisession")
 options(nflreadr.verbose = FALSE)
+source("R/timestamps.R")
 source("R/raw_pbp.R")
 source("R/update_pbp.R")
 source("R/update_playstats.R")
