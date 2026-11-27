@@ -119,6 +119,12 @@ jobs:
     if: needs.pbp_setup.outputs.pbp_types != '[]'
     name: Update ${{ matrix.season }} ${{ matrix.type }}
     runs-on: ubuntu-latest
+    # R + all dependencies preinstalled, see docker/Dockerfile
+    container:
+      image: ghcr.io/${{ github.repository }}:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: false
       # Many jobs uploading release assets at the same moment trip GitHub's
@@ -128,10 +134,8 @@ jobs:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
         type: ${{ fromJson(needs.pbp_setup.outputs.pbp_types) }}
     env:
-      # used by the gh cli for release uploads
-      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
-      # pak reads GITHUB_PAT to resolve GitHub packages. Without it pak uses the
-      # public "bundled" PAT. Use this repo's own token so package installs
+      # R packages (gh, pak fallback in exec/refresh_nflverse.R) read
+      # GITHUB_PAT for GitHub API calls. Use this repo's own token so those
       # don't eat into the rate limits of the upload token.
       GITHUB_PAT: ${{ github.token }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
@@ -140,18 +144,16 @@ jobs:
       NFLVERSE_UPLOAD_TIMESTAMPS: "false"
     steps:
       - uses: actions/checkout@v6
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          use-public-rspm: true
-          extra-repositories: 'https://nflverse.r-universe.dev'
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          cache-version: 1
-          extra-packages: |
-            nflverse/nflverse-data
-            nflverse/fastrmodels
+      # The image ships with all dependencies, but nflverse packages change
+      # often and the data must be built with their latest versions.
+      - name: Refresh nflverse packages
+        run: Rscript exec/refresh_nflverse.R
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("exec/update_data.R")'
+        env:
+          # used by the gh cli for release uploads. Set only here so the
+          # refresh step, which installs unpinned GitHub code, never sees it.
+          GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
 
   update_stats:
     needs: [pbp_setup, update_pbp]
@@ -163,6 +165,12 @@ jobs:
       (needs.update_pbp.result == 'success' || needs.update_pbp.result == 'skipped')
     name: Update ${{ matrix.season }} ${{ matrix.type }}
     runs-on: ubuntu-latest
+    # R + all dependencies preinstalled, see docker/Dockerfile
+    container:
+      image: ghcr.io/${{ github.repository }}:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: false
       # stats uploads 8 datasets per season. More than 4 seasons uploading at
@@ -172,7 +180,6 @@ jobs:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
         type: ["stats"]
     env:
-      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       GITHUB_PAT: ${{ github.token }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
@@ -180,18 +187,16 @@ jobs:
       NFLVERSE_UPLOAD_TIMESTAMPS: "false"
     steps:
       - uses: actions/checkout@v6
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          use-public-rspm: true
-          extra-repositories: 'https://nflverse.r-universe.dev'
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          cache-version: 1
-          extra-packages: |
-            nflverse/nflverse-data
-            nflverse/fastrmodels
+      # The image ships with all dependencies, but nflverse packages change
+      # often and the data must be built with their latest versions.
+      - name: Refresh nflverse packages
+        run: Rscript exec/refresh_nflverse.R
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("exec/update_data.R")'
+        env:
+          # used by the gh cli for release uploads. Set only here so the
+          # refresh step, which installs unpinned GitHub code, never sees it.
+          GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
 
   # Upload timestamp.txt and timestamp.json once per release instead of once per
   # matrix job. A release gets a new timestamp if at least one of its data files
