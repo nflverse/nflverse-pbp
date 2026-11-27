@@ -36,11 +36,16 @@ RUN . /etc/os-release && export VERSION_CODENAME \
 # pak (not install.packages) because it also installs the system libraries
 # the binaries need. Only DESCRIPTION is copied so code changes don't
 # invalidate this layer.
+# pak replaces RemoteSha (the GitHub commit r-universe built a package from)
+# with the version number. exec/refresh_nflverse.R compares RemoteSha with
+# GitHub HEAD, so we reinstall the nflverse packages it refreshes with
+# install.packages(), which keeps r-universe's DESCRIPTION as is.
 COPY DESCRIPTION /tmp/build/DESCRIPTION
 RUN Rscript -e ' \
     pak::pkg_install(c("nflfastR", "nflreadr", "nflversedata", "fastrmodels")); \
     pak::local_install_deps("/tmp/build"); \
     pak::cache_clean(); \
+    install.packages(c("nflfastR", "nflreadr", "nflversedata")); \
   ' \
   && rm -rf /tmp/build /tmp/Rtmp* /var/lib/apt/lists/*
 
@@ -50,7 +55,10 @@ RUN gh --version \
     pkgs <- c("nflfastR", "nflreadr", "nflversedata", "fastrmodels", \
               "gsisdecoder", "cli", "glue", "future", "dplyr", "data.table", \
               "arrow", "pak"); \
-    for (p in pkgs) { loadNamespace(p); cat(p, format(packageVersion(p)), "\n") } \
+    for (p in pkgs) { \
+      loadNamespace(p); \
+      cat(p, format(packageVersion(p)), packageDescription(p)$RemoteSha, "\n") \
+    } \
   '
 
 CMD ["R"]
