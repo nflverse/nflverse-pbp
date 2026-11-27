@@ -122,12 +122,21 @@ jobs:
       - uses: nflverse/actions/setup@v1
         with:
           packages: nflverse/nflfastR nflverse/nflreadr nflverse/nflverse-data
+      # write access to the releases in nflverse-data (pbp, stats_player,
+      # stats_team) and nflverse-pbp (playstats) only. Minted after setup,
+      # which installs unpinned GitHub code.
+      - id: upload-token
+        uses: nflverse/actions/app-token@v1
+        with:
+          client-id: ${{ vars.NFLVERSE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NFLVERSE_APP_PRIVATE_KEY }}
+          repositories: nflverse-data, nflverse-pbp
+          contents: write
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("exec/update_data.R")'
         env:
-          # used by the gh cli for release uploads. Set only here so the
-          # setup step, which installs unpinned GitHub code, never sees it.
-          GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+          # used by the gh cli for release uploads
+          GH_TOKEN: ${{ steps.upload-token.outputs.token }}
 
   update_stats:
     needs: [pbp_setup, update_pbp]
@@ -160,12 +169,21 @@ jobs:
       - uses: nflverse/actions/setup@v1
         with:
           packages: nflverse/nflfastR nflverse/nflreadr nflverse/nflverse-data
+      # write access to the releases in nflverse-data (pbp, stats_player,
+      # stats_team) and nflverse-pbp (playstats) only. Minted after setup,
+      # which installs unpinned GitHub code.
+      - id: upload-token
+        uses: nflverse/actions/app-token@v1
+        with:
+          client-id: ${{ vars.NFLVERSE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NFLVERSE_APP_PRIVATE_KEY }}
+          repositories: nflverse-data, nflverse-pbp
+          contents: write
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("exec/update_data.R")'
         env:
-          # used by the gh cli for release uploads. Set only here so the
-          # setup step, which installs unpinned GitHub code, never sees it.
-          GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+          # used by the gh cli for release uploads
+          GH_TOKEN: ${{ steps.upload-token.outputs.token }}
 
   # Upload timestamp.txt and timestamp.json once per release instead of once per
   # matrix job. A release gets a new timestamp if at least one of its data files
@@ -176,8 +194,15 @@ jobs:
     name: Upload release timestamps
     runs-on: ubuntu-latest
     steps:
+      - id: upload-token
+        uses: nflverse/actions/app-token@v1
+        with:
+          client-id: ${{ vars.NFLVERSE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NFLVERSE_APP_PRIVATE_KEY }}
+          repositories: nflverse-data, nflverse-pbp
+          contents: write
       - uses: nflverse/actions/upload-timestamps@v1
         with:
           started-at: ${{ needs.pbp_setup.outputs.started_at }}
           releases: ${{ needs.pbp_setup.outputs.releases }}
-          token: ${{ secrets.NFLVERSE_GH_TOKEN }}
+          token: ${{ steps.upload-token.outputs.token }}

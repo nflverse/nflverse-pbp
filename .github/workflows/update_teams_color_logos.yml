@@ -17,9 +17,18 @@ jobs:
         with:
           packages: nflverse/nflreadr nflverse/nflverse-data
 
+      # write access to the teams release in nflverse-data only. Minted after
+      # setup, which installs unpinned GitHub code.
+      - id: upload-token
+        uses: nflverse/actions/app-token@v1
+        with:
+          client-id: ${{ vars.NFLVERSE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NFLVERSE_APP_PRIVATE_KEY }}
+          repositories: nflverse-data
+          contents: write
+
       - name: Release teams data
         run: Rscript -e 'source("exec/update_teams_colors_logos.R")'
         env:
-          # used by the gh cli for release uploads. Set only here so the
-          # setup step, which installs unpinned GitHub code, never sees it.
-          GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+          # used by the gh cli for release uploads
+          GH_TOKEN: ${{ steps.upload-token.outputs.token }}
