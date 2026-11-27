@@ -17,6 +17,10 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     env:
       GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
+      # R packages (gh, pak in exec/refresh_nflverse.R) read GITHUB_PAT for
+      # GitHub API calls. Use this repo's own token so those don't eat into the
+      # rate limits of the upload token.
+      GITHUB_PAT: ${{ github.token }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
