@@ -25,6 +25,7 @@ Imports:
     data.table,
     dplyr (>= 1.0.7),
     future (>= 1.21.0),
+    gh,
     glue (>= 1.4.2),
     gsisdecoder,
     nflfastR (>= 4.1.0)

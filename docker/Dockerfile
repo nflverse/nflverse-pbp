@@ -54,10 +54,17 @@ RUN gh --version \
   && Rscript -e ' \
     pkgs <- c("nflfastR", "nflreadr", "nflversedata", "fastrmodels", \
               "gsisdecoder", "cli", "glue", "future", "dplyr", "data.table", \
-              "arrow", "pak"); \
+              "arrow", "gh", "pak"); \
     for (p in pkgs) { \
       loadNamespace(p); \
       cat(p, format(packageVersion(p)), packageDescription(p)$RemoteSha, "\n") \
+    }; \
+    for (p in c("nflfastR", "nflreadr", "nflversedata")) { \
+      sha <- packageDescription(p, fields = "RemoteSha"); \
+      if (!grepl("^[0-9a-f]{40}$", sha)) { \
+        stop(p, " has RemoteSha ", sha, " instead of a commit. ", \
+             "Did the install.packages() reinstall fail?") \
+      } \
     } \
   '
 

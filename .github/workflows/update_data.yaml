@@ -134,8 +134,6 @@ jobs:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
         type: ${{ fromJson(needs.pbp_setup.outputs.pbp_types) }}
     env:
-      # used by the gh cli for release uploads
-      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       # R packages (gh, pak fallback in exec/refresh_nflverse.R) read
       # GITHUB_PAT for GitHub API calls. Use this repo's own token so those
       # don't eat into the rate limits of the upload token.
@@ -152,6 +150,10 @@ jobs:
         run: Rscript exec/refresh_nflverse.R
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("exec/update_data.R")'
+        env:
+          # used by the gh cli for release uploads. Set only here so the
+          # refresh step, which installs unpinned GitHub code, never sees it.
+          GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
 
   update_stats:
     needs: [pbp_setup, update_pbp]
@@ -178,7 +180,6 @@ jobs:
         season: ${{ fromJson(needs.pbp_setup.outputs.seasons) }}
         type: ["stats"]
     env:
-      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       GITHUB_PAT: ${{ github.token }}
       NFLVERSE_UPDATE_SEASON: ${{ matrix.season }}
       NFLVERSE_UPDATE_TYPE: ${{ matrix.type }}
@@ -192,6 +193,10 @@ jobs:
         run: Rscript exec/refresh_nflverse.R
       - name: Release ${{ matrix.type }}
         run: Rscript -e 'source("exec/update_data.R")'
+        env:
+          # used by the gh cli for release uploads. Set only here so the
+          # refresh step, which installs unpinned GitHub code, never sees it.
+          GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
 
   # Upload timestamp.txt and timestamp.json once per release instead of once per
   # matrix job. A release gets a new timestamp if at least one of its data files

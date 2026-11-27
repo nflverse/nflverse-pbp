@@ -16,7 +16,6 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     env:
-      GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
       # R packages (gh, pak in exec/refresh_nflverse.R) read GITHUB_PAT for
       # GitHub API calls. Use this repo's own token so those don't eat into the
       # rate limits of the upload token.
@@ -30,3 +29,7 @@ jobs:
 
       - name: Release teams data
         run: Rscript -e 'source("exec/update_teams_colors_logos.R")'
+        env:
+          # used by the gh cli for release uploads. Set only here so the
+          # refresh step, which installs unpinned GitHub code, never sees it.
+          GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
