@@ -9,27 +9,17 @@ permissions: read-all
 jobs:
   update_teams:
     runs-on: ubuntu-latest
-    # R + all dependencies preinstalled, see docker/Dockerfile
-    container:
-      image: ghcr.io/${{ github.repository }}:latest
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    env:
-      # R packages (gh, pak in exec/refresh_nflverse.R) read GITHUB_PAT for
-      # GitHub API calls. Use this repo's own token so those don't eat into the
-      # rate limits of the upload token.
-      GITHUB_PAT: ${{ github.token }}
+    # R + all dependencies preinstalled, see https://github.com/nflverse/actions
+    container: ghcr.io/nflverse/r-runner:latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6
-
-      - name: Refresh nflverse packages
-        run: Rscript exec/refresh_nflverse.R
+      # Checkout + nflverse packages at their latest commit
+      - uses: nflverse/actions/setup@v1
+        with:
+          packages: nflverse/nflreadr nflverse/nflverse-data
 
       - name: Release teams data
         run: Rscript -e 'source("exec/update_teams_colors_logos.R")'
         env:
           # used by the gh cli for release uploads. Set only here so the
-          # refresh step, which installs unpinned GitHub code, never sees it.
+          # setup step, which installs unpinned GitHub code, never sees it.
           GH_TOKEN: ${{ secrets.NFLVERSE_GH_TOKEN }}
